@@ -14,7 +14,10 @@ import XMonad.Util.NamedScratchpad
 import XMonad.Util.XUtils (fi)
 import XMonad.Util.NamedWindows (getName)
 import XMonad.Util.Run
+import XMonad.Util.WindowProperties (getProp32s)
+import XMonad.Layout.ToggleLayouts
 import XMonad.Layout.ResizableTile
+import XMonad.Layout.SimplestFloat
 import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
 import XMonad.Layout.BoringWindows
@@ -165,21 +168,32 @@ myManageHook = composeAll $
     namedScratchpadManageHook scratchpads :
     manageDocks :
     manageHook def :
-    map (--> doCenterFloat') (isDialog : byClass ++ byProp)
+    byFeh :
+    map (--> doCenterFloat') (isDialog : byClass ++ byProp ++ byProp32Exists)
 
     where
         nSMHook = namedScratchpadManageHook
         byClass = map (className =?)
-            [ "feh"
-            , "mpv"
+            [ "mpv"
             , "sun-awt-X11-XFramePeer"
             , "Pinentry"
-            ]
+            , "DDLC" ]
         byProp  = map (\(prop, val) -> stringProperty prop =? val)
             [ ("WM_WINDOW_ROLE", "GtkFileChooserDialog")
             , ("WM_WINDOW_ROLE", "gimp-message-dialog")
             , ("WM_WINDOW_ROLE", "gimp-toolbox-color-dialog")
-            , ("WM_WINDOW_ROLE", "file-png") ]
+            , ("WM_WINDOW_ROLE", "file-png")
+            , ("WM_NAME", "Friends")
+            , ("WM_NAME", "Steam - News")
+            , ("WM_NAME", "Discord Updater") ]
+
+        byProp32Exists = map (\prop -> prop32Exists prop)
+            [ "STEAM_GAME" ]
+
+        byFeh = className =? "feh" --> doCenterFeh
+
+        prop32Exists :: String -> Query Bool
+        prop32Exists prop = fmap isJust $ ask >>= liftX . getProp32s prop
 
 -- Custom manage hook to center a window in the AVAILABLE window area.
 
@@ -202,10 +216,29 @@ doCenterFloat' = doFloatDep move where
 
         in wrr cx cy nw nh
 
+doCenterFeh :: ManageHook
+doCenterFeh = doFloatDep move where
+    move (W.RationalRect _ _ w h) =
+        let phr = panelheight % fullheight
+            mhr = 1 - phr
+
+            aw = w + (2*borderwidth) % fullwidth
+            ah = h + (2*borderwidth) % fullheight
+
+            cx | aw > 0.62 = (1 - nw)/2
+               | otherwise = (1 - nw)/2 - 308 % fullwidth
+            cy | nh <= mhr = (1 - nh + phr)/2
+               | otherwise = (1 - nh)/2
+            nw |   aw <= 1 = aw
+               | otherwise = w
+            nh |   ah <= 1 = ah
+               | otherwise = h
+
+        in wrr cx cy nw nh
+
 ------------------------------------------------------------------------ layouts
 
-tallLayout = lessBorders OnlyFloat
-    . minimize
+tallLayout = minimize
     . boringWindows
     . limitWindows 3
     . spacing (fi windowgap)
@@ -230,7 +263,8 @@ addGaps = gaps [ (U, fi $ vpadding + panelheight)
                , (L, fi hpadding)
                ]
 
-myLayoutHook = (addGaps tallLayout ||| fullLayout)
+myLayoutHook = lessBorders OnlyFloat $ toggleLayouts simplestFloat
+    (addGaps tallLayout ||| fullLayout)
 
 ---------------------------------------------------- keyboard and mouse bindings
 
@@ -253,8 +287,12 @@ myKeyBindings =
     , ((modm, xK_j), focusDown)
     , ((modm, xK_k), focusUp)
 
+    -- toggle between simplestFloat and alternated full/tile
+    , ((modm .|. controlMask, xK_space), sendMessage ToggleLayout)
+
     -- centering float windows
     , ((modm, xK_c), withFocused centerWindow)
+    , ((modm .|. controlMask, xK_c), withFocused centerWindowM)
 
     -- workspaces
     , ((modm, xK_Right), moveTo Next (WSIs notSP))
@@ -289,9 +327,10 @@ myKeyBindings =
     ]
 
     where
-        notSP        = (return $ ("NSP" /=) . W.tag) :: X (WindowSpace -> Bool)
-        centerWindow = keysMoveWindowTo (958, 549) (1/2, 1/2)
-        namedSA      = namedScratchpadAction
+        notSP         = (return $ ("NSP" /=) . W.tag) :: X (WindowSpace -> Bool)
+        centerWindow  = keysMoveWindowTo (958, 549) (1/2, 1/2)
+        centerWindowM = keysMoveWindowTo (650, 549) (1/2, 1/2)
+        namedSA       = namedScratchpadAction
 
         notify :: MonadIO m => String -> String -> m ()
         notify t s = spawn (printf "notify-send \"%s\" \"%s\"" t s :: String)
