@@ -47,7 +47,7 @@ main = do
         { terminal           = "urxvt -e tmux"
         , focusFollowsMouse  = True
 
-        , focusedBorderColor = "#656565"
+        , focusedBorderColor = "#b44c21"
         , normalBorderColor  = "#656565"
         , borderWidth        = 2
 
@@ -140,7 +140,8 @@ scratchpads = [ NS "music" "urxvt -title music -e ncmpcpp"
 -------------------------------------------------------------------------- hooks
 
 myStartupHook = startupHook def  <+>
-                docksStartupHook
+                docksStartupHook <+>
+                setSupportedWithFullscreen
 
 myLogHook h = (dynamicLogWithPP $ customPP { ppOutput = shittyFilter h })
     >> updatePointer (0.5, 0.5) (0, 0.25)
@@ -235,6 +236,26 @@ doCenterFeh = doFloatDep move where
                | otherwise = h
 
         in wrr cx cy nw nh
+
+--------------------------------------------------------- firefox fullscreen fix
+
+setSupportedWithFullscreen :: X ()
+setSupportedWithFullscreen = withDisplay $ \dpy -> do
+    r <- asks theRoot
+    a <- getAtom "_NET_SUPPORTED"
+    c <- getAtom "ATOM"
+    supp <- mapM getAtom ["_NET_WM_STATE_HIDDEN"
+                         ,"_NET_WM_STATE_FULLSCREEN"
+                         ,"_NET_NUMBER_OF_DESKTOPS"
+                         ,"_NET_CLIENT_LIST"
+                         ,"_NET_CLIENT_LIST_STACKING"
+                         ,"_NET_CURRENT_DESKTOP"
+                         ,"_NET_DESKTOP_NAMES"
+                         ,"_NET_ACTIVE_WINDOW"
+                         ,"_NET_WM_DESKTOP"
+                         ,"_NET_WM_STRUT"
+                         ]
+    io $ changeProperty32 dpy r a c propModeReplace (fmap fromIntegral supp)
 
 ------------------------------------------------------------------------ layouts
 
