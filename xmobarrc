@@ -1,0 +1,54 @@
+Config
+    { font = "xft:DejaVu Sans Mono:size=9,IPAGothic:size=10,Unifont:size=9"
+
+    , borderColor = "#656565"
+    , border = BottomB
+    , borderWidth = 2
+
+    , bgColor = "#ffffff"
+    , fgColor = "#000000"
+    , position = Static { xpos = 0, ypos = 0, width = 1920, height = 22 }
+    , persistent = True
+
+    , commands =
+        [ Run Date "%A, %B %d ~ %H:%M" "date" 10
+        , Run UnsafeStdinReader
+        --, Run PipeReader "/tmp/wtitle.fifo" "wtitle"
+
+        , Run Cpu
+            [ "-t", "<total>%", "-c", "0", "-w", "2", "-M", "3"
+            ] 10
+        , Run Memory
+            [ "-t", "<usedratio>%", "-c", "0", "-w", "2", "-M", "3"
+            ] 10
+        , Run Battery
+			[ "-t", "<leftipat> <acstatus>", "-c", "0", "-w", "2", "-M", "3"
+            , "--"
+            , "--on-icon-pattern", "<icon=.local/share/icons/xpm/bat-ac.xpm/>"
+            , "--off-icon-pattern", "<icon=.local/share/icons/xpm/bat_%%.xpm/>"
+            , "--idle-icon-pattern", "<icon=.local/share/icons/xpm/bat-ac.xpm/>"
+			, "-i", "AC"
+			, "-O", "<left>%"
+            , "-o", "<left>%"
+            ] 10
+        , Run MPD
+            [ "-t", "<statei> <artist> - <title>"
+            , "--", "-P", "<icon=.local/share/icons/xpm/play.xpm/>"
+            ,       "-Z", "<icon=.local/share/icons/xpm/pause.xpm/>"
+            ,       "-S", "<icon=.local/share/icons/xpm/stop.xpm/>"
+            ] 5
+        ]
+
+    , sepChar = "%"
+    , alignSep = "}{"
+    , template = " \
+    	\<icon=.local/share/icons/xpm/cpu.xpm/> %cpu% \
+        \<icon=.local/share/icons/xpm/mem.xpm/> %memory% \
+        \%battery% <icon=.local/share/icons/xpm/vbar.xpm/> \
+        \<action=`mpc toggle`>%mpd%</action> \
+    	\}%UnsafeStdinReader%{ \
+    	\<action=`date-not`>\
+        \<icon=.local/share/icons/xpm/date.xpm/> %date% </action>"
+    }
+
+-- vim: set syntax=haskell expandtab :
