@@ -26,11 +26,13 @@ import XMonad.Layout.Spacing
 import XMonad.Layout.Gaps
 
 import Control.Monad
-import Text.Printf   (printf)
-import System.IO (Handle)
+import Text.Printf (printf)
+import System.IO (Handle, openFile, IOMode(..))
 import Data.Monoid
 import Data.Ratio
 import Data.Maybe
+import Data.List
+import Data.List.Split
 
 import qualified XMonad.Actions.FlexibleResize as Flex
 import qualified XMonad.StackSet as W
@@ -42,6 +44,7 @@ wrr = W.RationalRect
 
 main = do
     xmproc <- spawnPipe "xmobar"
+    wnpipe <- openFile "/dev/null" WriteMode --spawnPipe "wtfifo"
 
     xmonad . ewmh $ def
         { terminal           = "urxvt -e tmux"
@@ -55,7 +58,7 @@ main = do
         , workspaces         = myWorkspaces
 
         , startupHook        = myStartupHook
-        , logHook            = myLogHook xmproc
+        , logHook            = myLogHook xmproc wnpipe
         , manageHook         = myManageHook
         , handleEventHook    = myHandleEventHook
         , layoutHook         = myLayoutHook
@@ -82,33 +85,39 @@ modm = mod4Mask
 
 -------------------------------------------------------------------- prettyprint
 
-customPP :: PP
-customPP = def
-    { ppHidden = emptyStr
-    , ppVisible = emptyStr
-    , ppHiddenNoWindows = emptyStr
-    , ppUrgent = emptyStr
-    , ppTitle = emptyStr
-    , ppLayout = emptyStr
+emptyPP :: PP
+emptyPP = def
+    { ppHidden = const ""
+    , ppVisible = const ""
+    , ppHiddenNoWindows = const ""
+    , ppUrgent = const ""
+    , ppTitle = const ""
+    , ppLayout = const ""
     , ppSep = ""
     , ppWsSep = ""
-    , ppCurrent = id
-    , ppExtras = [ fmap surround minimizedNum ]
+    , ppCurrent = const ""
     }
 
+customPP :: PP
+customPP = emptyPP
+    { ppCurrent = id
+    , ppTitle = id
+    , ppSep = "~"
+    , ppOrder = \(ws:_:t:rs) -> t:ws:rs
+    , ppExtras = [ fmap surround minimizedNum ]
+    }
     where
-        emptyStr = \_ -> ""
         surround = fmap $ \s -> if (read s /= 0) then " (" ++ s ++ ")"
                                                  else ""
 
 -------------------------------------------------------------------- scratchpads
 
 scratchpads :: [NamedScratchpad]
-scratchpads = [ NS "music" "urxvt -title music -e ncmpcpp"
-                  (title =? "music")
-                  (customFloating $ wrr mrx mry mrw mrh)
+scratchpads = [ --NS "music" "urxvt -title music -e ncmpcpp"
+                --  (title =? "music")
+                --  (customFloating $ wrr mrx mry mrw mrh)
 
-              , NS "term" "urxvt -title scratch -e tmux"
+               NS "term" "urxvt -title scratch -e tmux"
                   (title =? "scratch")
                   (customFloating $ wrr trx try trw trh)
 
@@ -143,22 +152,29 @@ myStartupHook = startupHook def  <+>
                 docksStartupHook <+>
                 setSupportedWithFullscreen
 
-myLogHook h = (dynamicLogWithPP $ customPP { ppOutput = shittyFilter h })
+myLogHook xmobarH _ = (dynamicLogWithPP $ customPP { ppOutput = ppOutputF })
     >> updatePointer (0.5, 0.5) (0, 0.25)
-
     where
-        wrapIcon :: String -> String
-        wrapIcon s = "<icon=.local/share/icons/xpm/" ++ s ++ ".xpm/>"
-
-        shittyFilter :: Handle -> String -> IO ()
-        shittyFilter h s =
-            if ' ' `elem` s then
-                let [wkspc,right] = words s
-                    spaceNum  = length right + 1
-                    spaceStr  = take spaceNum $ repeat ' '
-                in  hPutStrLn h (spaceStr ++ wrapIcon wkspc ++ " " ++ right)
-            else
-                hPutStrLn h $ wrapIcon s
+        ppOutputF rawLogStr = do
+            hPutStrLn xmobarH centerField
+            --hPutStrLn pipeH windowTitle
+            where
+                tok = ppSep customPP
+                mWsExist = ')' == last rawLogStr
+                minimizedTax | mWsExist = init
+                             | otherwise = id
+                centerField  | mWsExist = paddedWSName
+                             | otherwise = wrappedWSName
+                splitLogStr = splitOn tok rawLogStr
+                workspaceName = last $ minimizedTax splitLogStr
+                --windowTitle = intercalate tok . init $ minimizedTax splitLogStr
+                wrappedWSName = wrapIcon workspaceName
+                paddedWSName | mWsExist = leftPad ++ wrappedWSName ++ rightPad
+                             | otherwise = wrappedWSName
+                    where
+                        rightPad = last splitLogStr
+                        leftPad = replicate(length rightPad) ' '
+                wrapIcon s = "<icon=.local/share/icons/xpm/" ++ s ++ ".xpm/>"
 
 myHandleEventHook =
     fullscreenEventHook <+>
@@ -334,7 +350,7 @@ myKeyBindings =
 
     -- scratchpads
     , ((modm .|. controlMask, xK_Return), namedSA scratchpads "term")
-    , ((modm .|. controlMask, xK_m),      namedSA scratchpads "music")
+    --, ((modm .|. controlMask, xK_m),      namedSA scratchpads "music")
     , ((modm .|. controlMask, xK_v),      namedSA scratchpads "volume")
     ]
     ++
