@@ -31,7 +31,7 @@ Config
 			, "-O", "<left>%"
             , "-o", "<left>%"
             ] 10
-        , Run MPD
+        , Run MPD -- TODO: replace this with a script that uses mpc idle
             [ "-t", "<statei> <artist> - <title>"
             , "--", "-P", "<icon=.local/share/icons/xpm/play.xpm/>"
             ,       "-Z", "<icon=.local/share/icons/xpm/pause.xpm/>"
@@ -51,4 +51,4 @@ Config
         \<icon=.local/share/icons/xpm/date.xpm/> %date% </action>"
     }
 
--- vim: set syntax=haskell expandtab :
+-- vim: set filetype=haskell syntax=haskell expandtab :
