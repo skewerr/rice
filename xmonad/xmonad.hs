@@ -7,23 +7,25 @@ import XMonad.Actions.FloatKeys
 import XMonad.Actions.Minimize
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.ManageHelpers
+import XMonad.Hooks.InsertPosition
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Util.EZConfig
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.XUtils (fi)
 import XMonad.Util.NamedWindows (getName)
 import XMonad.Util.Run
-import XMonad.Util.WindowProperties (getProp32s)
-import XMonad.Layout.ToggleLayouts
-import XMonad.Layout.ResizableTile
+import XMonad.Util.CenterRationalRect
 import XMonad.Layout.SimplestFloat
-import XMonad.Layout.LimitWindows
 import XMonad.Layout.NoBorders
 import XMonad.Layout.BoringWindows
 import XMonad.Layout.Minimize
 import XMonad.Layout.Spacing
 import XMonad.Layout.Gaps
+
+-- local stuff
+import XMonad.Hooks.ShittyManageHooks
+import XMonad.Layout.SResizableTile
+import XMonad.Util.CenterRationalRect
 
 import Control.Monad
 import Text.Printf (printf)
@@ -38,8 +40,6 @@ import qualified XMonad.Actions.FlexibleResize as Flex
 import qualified XMonad.StackSet as W
 import qualified Data.Map as M
 
-wrr = W.RationalRect
-
 ------------------------------------------------------------------ main function
 
 main = do
@@ -52,7 +52,7 @@ main = do
 
         , focusedBorderColor = "#b44c21"
         , normalBorderColor  = "#656565"
-        , borderWidth        = 2
+        , borderWidth        = fi borWid
 
         , modMask            = modm
         , workspaces         = myWorkspaces
@@ -70,16 +70,15 @@ main = do
 
 ----------------------------------------------------------------- some variables
 
-(fullwidth, fullheight) = (1920 :: Integer, 1080 :: Integer) -- self explanatory
-(cellwidth, cellheight) = (   7 :: Integer,   14 :: Integer) -- terminal cells
-(hpadding, vpadding)    = (  36 :: Integer,   39 :: Integer) -- gaps
+scrRes@(scrWid, scrHei) = (1920 :: Integer, 1080 :: Integer) -- self explanatory
+chaRes@(chaWid, chaHei) = (   7 :: Integer,   14 :: Integer) -- terminal cells
+(horPad, verPad)        = (  36 :: Integer,   39 :: Integer) -- gaps
 
-panelheight = 22 :: Integer -- height of the top panel
-borderwidth =  2 :: Integer -- window border
-termpadding =  5 :: Integer -- terminal padding (aka internal border)
-windowgap   =  7 :: Integer -- window margin, will appear twofold
+panHei = 22 -- :: Integer -- height of the top panel
+borWid =  2 -- :: Integer -- border width for the windows
+terPad =  5 -- :: Integer -- terminal padding (internal border)
+winGap =  7 -- :: Integer -- window margin, will appear twofold
 
---myWorkspaces = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX"]
 myWorkspaces = ["月", "火", "水", "木", "金", "土", "日"]
 modm = mod4Mask
 
@@ -113,38 +112,17 @@ customPP = emptyPP
 -------------------------------------------------------------------- scratchpads
 
 scratchpads :: [NamedScratchpad]
-scratchpads = [ --NS "music" "urxvt -title music -e ncmpcpp"
-                --  (title =? "music")
-                --  (customFloating $ wrr mrx mry mrw mrh)
-
-               NS "term" "urxvt -title scratch -e tmux"
+scratchpads = [ NS "term" "urxvt -title scratch -e tmux"
                   (title =? "scratch")
-                  (customFloating $ wrr trx try trw trh)
-
+                  (customFloating $ centerIRectOffsetY panHei tw th sw sh)
               , NS "volume" "pavucontrol"
                   (className =? "Pavucontrol")
-                  (customFloating $ wrr vrx vry vrw vrh)
+                  (customFloating $ centerIRectOffsetY panHei vw vh sw sh)
               ]
-
-              where
-                  trx = (1 - trw)/2
-                  try = (1 - trh + prh)/2
-                  trw = tw % fullwidth
-                  trh = th % fullheight
-
-                  prh = panelheight % fullheight
-                  tw  = 100 * cellwidth + 2 * (borderwidth + termpadding)
-                  th  = 27 * cellheight + 2 * (borderwidth + termpadding)
-
-                  vrx = (1 - vrw)/2
-                  vry = (1 - vrh + prh)/2
-                  vrw = 0.4
-                  vrh = 0.6
-
-                  mrx = - borderwidth % fullwidth
-                  mry = 1 - mrh
-                  mrw = 1 + 2*borderwidth % fullwidth
-                  mrh = trh
+              where tw = 100 * chaWid + 2 * (borWid + terPad)
+                    th =  27 * chaHei + 2 * (borWid + terPad)
+                    (vw,vh) = (768,648)
+                    (sw,sh) = scrRes
 
 -------------------------------------------------------------------------- hooks
 
@@ -181,21 +159,22 @@ myHandleEventHook =
     handleEventHook def <+>
     docksEventHook
 
-myManageHook = composeAll $
-    namedScratchpadManageHook scratchpads :
-    manageDocks :
-    manageHook def :
-    byFeh :
-    map (--> doCenterFloat') (isDialog : byClass ++ byProp ++ byProp32Exists)
-
-    where
-        nSMHook = namedScratchpadManageHook
-        byClass = map (className =?)
+myManageHook = composeAll
+    [ namedScratchpadManageHook scratchpads
+    , manageDocks
+    , insertPosition Master Newer
+    , manageHook def
+    , manageByClassName centerHook floatClasses
+    , manageByProp32Exists centerHook floatProp32s
+    , manageByPropValue centerHook floatPropValues
+    ] where
+        centerHook = doCenterFloatOffset scrRes borWid panHei
+        floatClasses =
             [ "mpv"
+            , "feh"
             , "sun-awt-X11-XFramePeer"
-            , "Pinentry"
             , "DDLC" ]
-        byProp  = map (\(prop, val) -> stringProperty prop =? val)
+        floatPropValues =
             [ ("WM_WINDOW_ROLE", "GtkFileChooserDialog")
             , ("WM_WINDOW_ROLE", "gimp-message-dialog")
             , ("WM_WINDOW_ROLE", "gimp-toolbox-color-dialog")
@@ -203,55 +182,8 @@ myManageHook = composeAll $
             , ("WM_NAME", "Friends")
             , ("WM_NAME", "Steam - News")
             , ("WM_NAME", "Discord Updater") ]
-
-        byProp32Exists = map (\prop -> prop32Exists prop)
+        floatProp32s =
             [ "STEAM_GAME" ]
-
-        byFeh = className =? "feh" --> doCenterFeh
-
-        prop32Exists :: String -> Query Bool
-        prop32Exists prop = fmap isJust $ ask >>= liftX . getProp32s prop
-
--- Custom manage hook to center a window in the AVAILABLE window area.
-
-doCenterFloat' :: ManageHook
-doCenterFloat' = doFloatDep move where
-    move (W.RationalRect _ _ w h) =
-        let phr = panelheight % fullheight
-            mhr = 1 - phr
-
-            aw = w + (2*borderwidth) % fullwidth
-            ah = h + (2*borderwidth) % fullheight
-
-            cx = (1 - nw)/2
-            cy | nh <= mhr = (1 - nh + phr)/2
-               | otherwise = (1 - nh)/2
-            nw |   aw <= 1 = aw
-               | otherwise = w
-            nh |   ah <= 1 = ah
-               | otherwise = h
-
-        in wrr cx cy nw nh
-
-doCenterFeh :: ManageHook
-doCenterFeh = doFloatDep move where
-    move (W.RationalRect _ _ w h) =
-        let phr = panelheight % fullheight
-            mhr = 1 - phr
-
-            aw = w + (2*borderwidth) % fullwidth
-            ah = h + (2*borderwidth) % fullheight
-
-            cx | aw > 0.62 = (1 - nw)/2
-               | otherwise = (1 - nw)/2 - 308 % fullwidth
-            cy | nh <= mhr = (1 - nh + phr)/2
-               | otherwise = (1 - nh)/2
-            nw |   aw <= 1 = aw
-               | otherwise = w
-            nh |   ah <= 1 = ah
-               | otherwise = h
-
-        in wrr cx cy nw nh
 
 --------------------------------------------------------- firefox fullscreen fix
 
@@ -276,42 +208,40 @@ setSupportedWithFullscreen = withDisplay $ \dpy -> do
 ------------------------------------------------------------------------ layouts
 
 tallLayout = minimize
-    . boringWindows
-    . limitWindows 3
-    . spacing (fi windowgap)
-    $ ResizableTall nmaster delta ratio [botwrat, topwrat]
-
+    . spacing (fi winGap)
+    $ SRTall 3 delta ratio [botwrat, topwrat]
     where
         nmaster = 1
-        delta   = 2 % (fullheight - 2*(vpadding) - panelheight)
+        delta   = 2 % (scrHei - 2*(verPad) - panHei)
         ratio   = 1 - rightcolratio
 
         topwrat = 322 / 490 -- TODO: ratio should depend on padding and line #s
         botwrat = 658 / 490 -- TODO: same as above
 
-        rightcolratio = (84*cellwidth + 2*allgaps) % (fullwidth - 2*hpadding)
-        allgaps = windowgap + borderwidth + termpadding
+        rightcolratio = (84*chaWid + 2*allgaps) % (scrWid - 2*horPad)
+        allgaps = winGap + borWid + terPad
 
-fullLayout = noBorders . boringWindows . gaps [(U, fi panelheight)] $ Full
+fullLayout = noBorders . boringWindows . gaps [(U, fi panHei)] $ Full
 
-addGaps = gaps [ (U, fi $ vpadding + panelheight)
-               , (D, fi vpadding)
-               , (R, fi hpadding)
-               , (L, fi hpadding)
+addGaps = gaps [ (U, fi $ verPad + panHei)
+               , (D, fi verPad)
+               , (R, fi horPad)
+               , (L, fi horPad)
                ]
 
-myLayoutHook = lessBorders OnlyFloat $ toggleLayouts simplestFloat
-    (addGaps tallLayout ||| fullLayout)
+myLayoutHook = lessBorders OnlyFloat . boringWindows $ addGaps tallLayout ||| fullLayout
+-- toggleLayouts (addGaps tallLayout ||| addGaps accLayout)
+--     fullLayout
 
 ---------------------------------------------------- keyboard and mouse bindings
 
 myKeyBindings :: [((KeyMask, KeySym), X ())]
 myKeyBindings =
     -- resizableTall messages
-    [ ((modm, xK_a), sendMessage MirrorShrink)
-    , ((modm, xK_z), sendMessage MirrorExpand)
-    , ((modm, xK_s), replicateM_ (fi cellheight) $ sendMessage MirrorShrink)
-    , ((modm, xK_x), replicateM_ (fi cellheight) $ sendMessage MirrorExpand)
+    [ ((modm, xK_a), sendMessage SMShrink)
+    , ((modm, xK_z), sendMessage SMExpand)
+    , ((modm, xK_s), replicateM_ (fi chaHei) $ sendMessage SMShrink)
+    , ((modm, xK_x), replicateM_ (fi chaHei) $ sendMessage SMExpand)
 
     -- minimizing/restoring/swapping windows
     , ((modm, xK_m),                  withFocused minimizeWindow)
@@ -323,9 +253,6 @@ myKeyBindings =
     -- cycling through windows
     , ((modm, xK_j), focusDown)
     , ((modm, xK_k), focusUp)
-
-    -- toggle between simplestFloat and alternated full/tile
-    , ((modm .|. controlMask, xK_space), sendMessage ToggleLayout)
 
     -- centering float windows
     , ((modm, xK_c), withFocused centerWindow)
