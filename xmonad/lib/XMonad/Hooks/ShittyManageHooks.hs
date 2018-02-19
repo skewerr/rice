@@ -15,13 +15,13 @@ import Data.Monoid
 import Data.Ratio
 
 manageByPropValue :: ManageHook -> [(String,String)] -> Query (Endo WindowSet)
-manageByPropValue m = composeAll . map (\(p,v) -> stringProperty p =? v --> m)
+manageByPropValue m = composeOne . map (\(p,v) -> stringProperty p =? v -?> m)
 
 manageByProp32Exists :: ManageHook -> [String] -> Query (Endo WindowSet)
-manageByProp32Exists m = composeAll . map ((--> m) . prop32Exists)
+manageByProp32Exists m = composeOne . map ((-?> m) . prop32Exists)
 
 manageByClassName :: ManageHook -> [String] -> Query (Endo WindowSet)
-manageByClassName m = composeAll . map ((--> m) . (className =?))
+manageByClassName m = composeOne . map ((-?> m) . (className =?))
 
 prop32Exists :: String -> Query Bool
 prop32Exists p = fmap isJust $ ask >>= liftX . getProp32s p
