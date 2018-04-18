@@ -4,9 +4,9 @@ import XMonad.Actions.CopyWindow
 import XMonad.Actions.CycleWS
 import XMonad.Actions.UpdatePointer
 import XMonad.Actions.FloatKeys
-import XMonad.Actions.Minimize
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
+import XMonad.Hooks.ManageHelpers
 import XMonad.Hooks.InsertPosition
 import XMonad.Hooks.EwmhDesktops
 import XMonad.Util.EZConfig
@@ -23,8 +23,9 @@ import XMonad.Layout.Spacing
 import XMonad.Layout.Gaps
 
 -- local stuff
+import XMonad.Actions.Minimize
 import XMonad.Hooks.ShittyManageHooks
-import XMonad.Layout.SResizableTile
+import XMonad.Layout.HiddenQueueLayout
 import XMonad.Util.CenterRationalRect
 
 import Control.Monad
@@ -47,11 +48,12 @@ main = do
     wnpipe <- openFile "/dev/null" WriteMode --spawnPipe "wtfifo"
 
     xmonad . ewmh $ def
-        { terminal           = "urxvt -e tmux"
+        { terminal           = "st -e tmux"
         , focusFollowsMouse  = True
 
         , focusedBorderColor = "#b44c21"
         , normalBorderColor  = "#656565"
+        -- , normalBorderColor = "#455250"
         , borderWidth        = fi borWid
 
         , modMask            = modm
@@ -112,7 +114,7 @@ customPP = emptyPP
 -------------------------------------------------------------------- scratchpads
 
 scratchpads :: [NamedScratchpad]
-scratchpads = [ NS "term" "urxvt -title scratch -e tmux"
+scratchpads = [ NS "term" "st -n scratch -t scratch -e tmux new -A -s scratch"
                   (title =? "scratch")
                   (customFloating $ centerIRectOffsetY panHei tw th sw sh)
               , NS "volume" "pavucontrol"
@@ -162,13 +164,14 @@ myHandleEventHook =
 myManageHook = composeAll
     [ namedScratchpadManageHook scratchpads
     , manageDocks
-    , insertPosition Master Newer
     , manageHook def
-    , manageByClassName centerHook floatClasses
-    , manageByProp32Exists centerHook floatProp32s
-    , manageByPropValue centerHook floatPropValues
+    , composeOne' maybeHooks
     ] where
         centerHook = doCenterFloatOffset scrRes borWid panHei
+        maybeHooks = manageByClassName centerHook floatClasses
+            ++ manageByProp32Exists centerHook floatProp32s
+            ++ manageByPropValue centerHook floatPropValues
+            ++ [ isTiled <&&> isNotFixedSize -?> insertPosition Master Newer ]
         floatClasses =
             [ "mpv"
             , "feh"
@@ -207,21 +210,21 @@ setSupportedWithFullscreen = withDisplay $ \dpy -> do
 
 ------------------------------------------------------------------------ layouts
 
-tallLayout = minimize
+hqLayout = boringWindows
+    . minimize
+    . addGaps
     . spacing (fi winGap)
-    $ SRTall 3 delta ratio [botwrat, topwrat]
+    $ HQLayout 2 mratio tratio (7 % scrWid)
     where
-        nmaster = 1
-        delta   = 2 % (scrHei - 2*(verPad) - panHei)
-        ratio   = 1 - rightcolratio
-
-        topwrat = 322 / 490 -- TODO: ratio should depend on padding and line #s
-        botwrat = 658 / 490 -- TODO: same as above
-
-        rightcolratio = (84*chaWid + 2*allgaps) % (scrWid - 2*horPad)
+        mratio = 1 - rcratio
+        rcratio = (84 * chaWid + 2 * allgaps) % (scrWid - 2 * horPad)
         allgaps = winGap + borWid + terPad
+        tratio = 322/980
 
-fullLayout = noBorders . boringWindows . gaps [(U, fi panHei)] $ Full
+fullLayout = noBorders
+    . boringWindows
+    . gaps [(U, fi panHei)]
+    $ Full
 
 addGaps = gaps [ (U, fi $ verPad + panHei)
                , (D, fi verPad)
@@ -229,26 +232,18 @@ addGaps = gaps [ (U, fi $ verPad + panHei)
                , (L, fi horPad)
                ]
 
-myLayoutHook = lessBorders OnlyFloat . boringWindows $ addGaps tallLayout ||| fullLayout
--- toggleLayouts (addGaps tallLayout ||| addGaps accLayout)
---     fullLayout
+myLayoutHook = lessBorders OnlyFloat $ hqLayout ||| fullLayout
 
 ---------------------------------------------------- keyboard and mouse bindings
 
 myKeyBindings :: [((KeyMask, KeySym), X ())]
 myKeyBindings =
-    -- resizableTall messages
-    [ ((modm, xK_a), sendMessage SMShrink)
-    , ((modm, xK_z), sendMessage SMExpand)
-    , ((modm, xK_s), replicateM_ (fi chaHei) $ sendMessage SMShrink)
-    , ((modm, xK_x), replicateM_ (fi chaHei) $ sendMessage SMExpand)
-
     -- minimizing/restoring/swapping windows
-    , ((modm, xK_m),                  withFocused minimizeWindow)
+    [ ((modm, xK_m),                  withFocused minimizeWindow)
     , ((modm .|. shiftMask, xK_m),    withLastMinimized maximizeWindowAndFocus)
-    , ((modm .|. mod1Mask, xK_m),     swapWindow)
-    , ((modm .|. mod1Mask, xK_Left),  swapWindowLeft)
-    , ((modm .|. mod1Mask, xK_Right), swapWindowRight)
+    , ((modm .|. mod1Mask, xK_m),     withFocused swapWithFirstMinimized)
+    , ((modm .|. mod1Mask, xK_Left),  withFocused swapWithLastMinimized)
+    , ((modm .|. mod1Mask, xK_Right), withFocused swapWithFirstMinimized)
 
     -- cycling through windows
     , ((modm, xK_j), focusDown)
@@ -277,7 +272,6 @@ myKeyBindings =
 
     -- scratchpads
     , ((modm .|. controlMask, xK_Return), namedSA scratchpads "term")
-    --, ((modm .|. controlMask, xK_m),      namedSA scratchpads "music")
     , ((modm .|. controlMask, xK_v),      namedSA scratchpads "volume")
     ]
     ++
