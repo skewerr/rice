@@ -37,7 +37,7 @@ instance LayoutClass HiddenQueueLayout Window where
     doLayout (HQLayout swnum mratio stratio _) rect stack = do
         minimized <- currentlyMinimized
         when (length (tilesList minimized) > swnum + 1) $
-			minimizeWindow' (++) (tilesList minimized !! 1) (return ())
+            minimizeWindow' (++) (tilesList minimized !! 1) (return ())
         let tilesList' | length (tilesList minimized) > swnum + 1 = deleteInd 1 (tilesList minimized)
                        | otherwise = tilesList minimized
         return . (\x -> (x, Nothing)) . ap zip (tile swnum mratio stratio rect . length) $ tilesList'

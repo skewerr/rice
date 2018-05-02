@@ -37,7 +37,6 @@ module XMonad.Actions.Minimize
   , withFirstMinimized'
   , withMinimized
   , currentlyMinimized
-  , minimizedNum
   ) where
 
 import XMonad
@@ -54,6 +53,9 @@ import Control.Monad (join)
 import Data.Maybe (fromMaybe, listToMaybe)
 import qualified Data.List as L
 import qualified Data.Map as M
+
+-- the blackbird combinator, what a cool name
+(...) = (.) . (.)
 
 -- $usage
 -- Import this module with "XMonad.Layout.Minimize" and "XMonad.Layout.BoringWindows":
@@ -126,15 +128,13 @@ maximizeWindowAndFocus = maximizeWindowAndChangeWSet W.focusWindow
 
 -- | Swap a window with the last minimized window.
 swapWithLastMinimized :: Window -> X ()
-swapWithLastMinimized win = withLastMinimized $ \mwin -> do
-  minimizeWindow' (flip (++)) win $
-    maximizeWindowAndChangeWSet (\w -> W.sink win . W.focusWindow w) mwin
+swapWithLastMinimized win = withLastMinimized $ minimizeWindow' (flip (++)) win .
+  maximizeWindowAndChangeWSet (W.sink win ... W.focusWindow)
 
 -- | Swap a window with the first minimized window.
 swapWithFirstMinimized :: Window -> X ()
-swapWithFirstMinimized win = withFirstMinimized $ \mwin -> do
-  minimizeWindow' (++) win $
-    maximizeWindowAndChangeWSet (\w -> W.sink win . W.focusWindow w) mwin
+swapWithFirstMinimized win = withFirstMinimized $ minimizeWindow' (++) win .
+  maximizeWindowAndChangeWSet (W.sink win ... W.focusWindow)
 
 -- | Perform an action with first minimized window on current workspace
 --   or do nothing if there is no minimized windows on current workspace
@@ -165,6 +165,3 @@ withMinimized action = do
 -- | Return the list of minimized windows in the current workspace.
 currentlyMinimized :: X [Window]
 currentlyMinimized = withMinimized return
-
-minimizedNum :: X (Maybe String)
-minimizedNum = return . Just . show . length =<< currentlyMinimized
