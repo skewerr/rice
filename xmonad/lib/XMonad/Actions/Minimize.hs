@@ -37,6 +37,7 @@ module XMonad.Actions.Minimize
   , withFirstMinimized'
   , withMinimized
   , currentlyMinimized
+  , maximizeOnFocus
   ) where
 
 import XMonad
@@ -46,6 +47,8 @@ import qualified XMonad.Layout.BoringWindows as BW
 import qualified XMonad.Util.ExtensibleState as XS
 import XMonad.Util.Minimize
 import XMonad.Util.WindowProperties (getProp32)
+
+import XMonad.Hooks.ShittyManageHooks (isMaster)
 
 import Foreign.C.Types (CLong)
 import Control.Applicative((<$>))
@@ -103,8 +106,8 @@ minimizeWindow' c w action = withWindowSet $ \ws ->
 -- | Minimize a window
 minimizeWindow :: Window -> X ()
 minimizeWindow w = minimizeWindow' (++) w $ do
-  windows $ W.sink w
   BW.focusDown
+  windows $ W.sink w
 
 maximizeWindow' :: X () -> Window -> X ()
 maximizeWindow' action w = whenX (modified (++) $ M.delete w) $ do
@@ -126,15 +129,22 @@ maximizeWindow = maximizeWindowAndChangeWSet $ const id
 maximizeWindowAndFocus :: Window -> X ()
 maximizeWindowAndFocus = maximizeWindowAndChangeWSet W.focusWindow
 
+swapWithMinimized
+  :: ((Window -> X ()) -> X ())
+  -> ([Window] -> [Window] -> [Window])
+  -> Window
+  -> X ()
+swapWithMinimized swf lcf win = whenX (runQuery isMaster win) $
+  swf $ minimizeWindow' lcf win . maximizeWindowAndChangeWSet
+    ((W.swapMaster . W.sink win) ... W.focusWindow)
+
 -- | Swap a window with the last minimized window.
 swapWithLastMinimized :: Window -> X ()
-swapWithLastMinimized win = withLastMinimized $ minimizeWindow' (flip (++)) win .
-  maximizeWindowAndChangeWSet (W.sink win ... W.focusWindow)
+swapWithLastMinimized = swapWithMinimized withLastMinimized (flip (++))
 
 -- | Swap a window with the first minimized window.
 swapWithFirstMinimized :: Window -> X ()
-swapWithFirstMinimized win = withFirstMinimized $ minimizeWindow' (++) win .
-  maximizeWindowAndChangeWSet (W.sink win ... W.focusWindow)
+swapWithFirstMinimized = swapWithMinimized withFirstMinimized (++)
 
 -- | Perform an action with first minimized window on current workspace
 --   or do nothing if there is no minimized windows on current workspace
@@ -165,3 +175,11 @@ withMinimized action = do
 -- | Return the list of minimized windows in the current workspace.
 currentlyMinimized :: X [Window]
 currentlyMinimized = withMinimized return
+
+-- | Whenever a minimized window is focused, swap it with the master window
+maximizeOnFocus :: X ()
+maximizeOnFocus = withFocused $ \focusedWin -> do
+  minimized <- currentlyMinimized
+  if focusedWin `elem` minimized
+    then maximizeWindowAndChangeWSet (const W.swapMaster) focusedWin
+    else return ()

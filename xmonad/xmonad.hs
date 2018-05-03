@@ -109,8 +109,9 @@ myStartupHook =
 myLogHook xmobarH = do
     dynamicLogWithPP $ customPP { ppOutput = ppOutputF xmobarH }
     updatePointer (0.5, 0.5) (0, 0.25)
+    maximizeOnFocus
     where
-        toSpaces = (flip replicate) ' ' . length
+        toSpaces = map (const ' ')
         centerField [wkspc] = wkspc
         centerField [wkspc,mnum] = printf "%s %s %s" (toSpaces mnum) wkspc mnum
         ppOutputF handle = hPutStrLn handle . centerField . words
@@ -125,7 +126,8 @@ myManageHook = composeAll
     , manageDocks
     , manageHook def
     , composeOne' maybeHooks
-    ] where
+    ]
+    where
         centerHook = doCenterFloatOffset scrRes borWid panHei
         maybeHooks = manageByClassName centerHook floatClasses
             ++ manageByProp32Exists centerHook floatProp32s
@@ -173,7 +175,11 @@ setSupportedWithFullscreen = withDisplay $ \dpy -> do
 
 hqLayout = boringWindows
     . minimize
-    . addGaps
+    . gaps
+        [ (R, fi horPad), (L, fi horPad)
+        , (U, fi $ verPad + panHei)
+        , (D, fi verPad)
+        ]
     . spacing (fi winGap)
     $ HQLayout 2 mratio tratio (7 % scrWid)
     where
@@ -187,17 +193,10 @@ fullLayout = noBorders
     . gaps [(U, fi panHei)]
     $ Full
 
-addGaps = gaps [ (U, fi $ verPad + panHei)
-               , (D, fi verPad)
-               , (R, fi horPad)
-               , (L, fi horPad)
-               ]
-
 myLayoutHook = lessBorders OnlyFloat $ hqLayout ||| fullLayout
 
 ---------------------------------------------------- keyboard and mouse bindings
 
-myKeyBindings :: [((KeyMask, KeySym), X ())]
 myKeyBindings =
     -- minimizing/restoring/swapping windows
     [ ((modm, xK_m),                  withFocused minimizeWindow)

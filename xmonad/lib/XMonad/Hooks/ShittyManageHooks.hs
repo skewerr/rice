@@ -5,6 +5,7 @@ module XMonad.Hooks.ShittyManageHooks
     , doCenterFloatOffset
     , isFloating
     , isTiled
+    , isMaster
     , isNotFixedSize
     , composeOne'
     ) where
@@ -13,10 +14,13 @@ import XMonad
 import XMonad.Hooks.ManageHelpers
 import XMonad.Util.CenterRationalRect
 import XMonad.Util.WindowProperties (getProp32s)
-import XMonad.StackSet (RationalRect(..), floating)
+import XMonad.StackSet (RationalRect(..), floating, peek, focusMaster)
 import Data.Map (member, notMember)
-import Data.Maybe (isJust)
+import Data.Maybe (isJust, fromMaybe)
 import Data.Ratio
+
+isMaster :: Query Bool
+isMaster = ask >>= (\w -> liftX $ withWindowSet $ return . (w ==) . fromMaybe undefined . peek . focusMaster)
 
 isFloating :: Query Bool
 isFloating = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ member w (floating ws))
