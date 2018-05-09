@@ -6,7 +6,8 @@ module XMonad.Hooks.ShittyManageHooks
     , isFloating
     , isTiled
     , isMaster
-    , isNotFixedSize
+    , isMasterTile
+    , isFixedSize
     , composeOne'
     ) where
 
@@ -14,24 +15,34 @@ import XMonad
 import XMonad.Hooks.ManageHelpers
 import XMonad.Util.CenterRationalRect
 import XMonad.Util.WindowProperties (getProp32s)
-import XMonad.StackSet (RationalRect(..), floating, peek, focusMaster)
+import XMonad.StackSet (RationalRect(..), floating, peek, index, focusMaster)
 import Data.Map (member, notMember)
 import Data.Maybe (isJust, fromMaybe)
 import Data.Ratio
 
+isMasterTile :: Query Bool
+isMasterTile = ask >>= \win -> liftX . withWindowSet $ \ws ->
+  let floats = floating ws
+      tiled = filter (`notMember` floats) $ index ws
+      master = head tiled
+  in return (win == master)
+
 isMaster :: Query Bool
-isMaster = ask >>= (\w -> liftX $ withWindowSet $ return . (w ==) . fromMaybe undefined . peek . focusMaster)
+isMaster = ask >>= \win -> liftX . withWindowSet $ \ws -> return $
+  case peek (focusMaster ws) of
+    Just mw -> win == mw
+    Nothing -> False
 
 isFloating :: Query Bool
-isFloating = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ member w (floating ws))
+isFloating = ask >>= \w -> liftX . withWindowSet $ return . member w . floating
 
 isTiled :: Query Bool
-isTiled = ask >>= (\w -> liftX $ withWindowSet $ \ws -> return $ notMember w (floating ws))
+isTiled = fmap not isFloating
 
-isNotFixedSize :: Query Bool
-isNotFixedSize = ask >>= (\w -> liftX $ withDisplay $ \d -> do
+isFixedSize :: Query Bool
+isFixedSize = ask >>= (\w -> liftX $ withDisplay $ \d -> do
     sh <- io $ getWMNormalHints d w
-    return $ not $ sh_min_size sh /= Nothing && sh_min_size sh == sh_max_size sh )
+    return $ sh_min_size sh /= Nothing && sh_min_size sh == sh_max_size sh )
 
 composeOne' :: [MaybeManageHook] -> ManageHook
 composeOne' [] = idHook

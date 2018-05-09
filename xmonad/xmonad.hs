@@ -1,4 +1,4 @@
-import XMonad
+import XMonad -- {{{ and a bunch of other things
 import XMonad.Actions.CopyWindow
 import XMonad.Actions.CycleWS
 import XMonad.Actions.UpdatePointer
@@ -15,22 +15,44 @@ import XMonad.Util.NamedWindows (getName)
 import XMonad.Util.Run
 import XMonad.Layout.NoBorders
 import XMonad.Layout.BoringWindows
-import XMonad.Layout.Minimize
+-- import XMonad.Layout.Minimize
 import XMonad.Layout.Spacing
 import XMonad.Layout.Gaps
 
 import Text.Printf
 import Data.Ratio
+import Data.Monoid (All)
+import System.IO (Handle)
 
 import qualified XMonad.Actions.FlexibleResize as Flex
 import qualified XMonad.StackSet as W
 import qualified Data.Map as M
 
-import XMonad.Actions.Minimize
+-- import XMonad.Actions.Minimize
+import XMonad.Actions.Hidden
 import XMonad.Hooks.ShittyManageHooks
+import XMonad.Layout.Hidden
 import XMonad.Layout.HiddenQueueLayout
 import XMonad.Util.CenterRationalRect
+import XMonad.Util.Hidden
+-- }}}
 
+-- {{{ some constants
+-- TODO: get rid of these
+scrRes@(scrWid, scrHei) = (1920, 1080)
+chaRes@(chaWid, chaHei) = (   7,   14)
+(horPad, verPad) = (8, 11)
+
+panHei = 22 -- height of the top panel
+borWid =  2 -- border width for the windows
+terPad =  5 -- terminal padding (internal border)
+winGap =  7 -- window margin, will appear twofold
+
+myWorkspaces = ["月", "火", "水", "木", "金", "土", "日"]
+modm = mod4Mask
+-- }}}
+
+main :: IO () -- {{{
 main = do
     xmobarH <- spawnPipe "xmobar"
     xmonad . ewmh $ def
@@ -51,41 +73,24 @@ main = do
         `additionalKeys`          myKeyBindings
         `additionalMouseBindings` myMouseBindings
         `removeKeys`              myRemovedBindings
+-- }}}
 
------------------------------------------------------------------ some variables
-
-scrRes@(scrWid, scrHei) = (1920, 1080)
-chaRes@(chaWid, chaHei) = (   7,   14)
-(horPad, verPad) = (8, 11)
-
-panHei = 22 -- height of the top panel
-borWid =  2 -- border width for the windows
-terPad =  5 -- terminal padding (internal border)
-winGap =  7 -- window margin, will appear twofold
-
-myWorkspaces = ["月", "火", "水", "木", "金", "土", "日"]
-modm = mod4Mask
-
-------------------------------------------------------------- xmobar prettyprint
-
-customPP :: PP
-customPP = def
+barPP :: PP -- {{{
+barPP = def
     { ppHidden = const "", ppHiddenNoWindows = const "", ppVisible = const ""
     , ppUrgent = const ""
     , ppOrder = \(ws:_:_:rs) -> ws:rs
     , ppSep = " "
     , ppCurrent = toIcon
-    , ppExtras = [ minimizedNum ]
+    , ppExtras = [ hiddenNum ]
     }
     where
-        minimizedNum = withMinimized $ return . catchZero . length
+        hiddenNum = withHidden $ return . catchZero . length
         catchZero = \l -> if l == 0 then Nothing else Just . inParens $ show l
-        inParens = \s -> "(" ++ s ++ ")"
-        toIcon = \s -> "<icon=.local/share/icons/xpm/" ++ s ++ ".xpm/>"
-
--------------------------------------------------------------------- scratchpads
-
-scratchpads :: [NamedScratchpad]
+        inParens = wrap "(" ")"
+        toIcon = wrap "<icon=.local/share/icons/xpm/" ".xpm/>"
+-- }}}
+scratchpads :: [NamedScratchpad] -- {{{
 scratchpads =
     [ NS "term" "st -n scratch -t scratch -e tmux new -A -s scratch"
         (title =? "scratch")
@@ -98,29 +103,32 @@ scratchpads =
           th =  27 * chaHei + 2 * (borWid + terPad)
           (vw,vh) = (768,648)
           (sw,sh) = scrRes
+-- }}}
 
--------------------------------------------------------------------------- hooks
-
-myStartupHook =
-    startupHook def  <+>
-    docksStartupHook <+>
-    setSupportedWithFullscreen
-
+myStartupHook :: X () -- {{{
+myStartupHook
+      = startupHook def
+    <+> docksStartupHook
+    <+> setSupportedWithFullscreen
+-- }}}
+-- {{{ myLogHook :: Handle -> X ()
 myLogHook xmobarH = do
-    dynamicLogWithPP $ customPP { ppOutput = ppOutputF xmobarH }
+    dynamicLogWithPP $ barPP { ppOutput = ppOutputF xmobarH }
     updatePointer (0.5, 0.5) (0, 0.25)
-    maximizeOnFocus
+    unhideOnFocus
     where
-        toSpaces = map (const ' ')
+        toSpaces = (flip replicate) ' ' . length
         centerField [wkspc] = wkspc
         centerField [wkspc,mnum] = printf "%s %s %s" (toSpaces mnum) wkspc mnum
         ppOutputF handle = hPutStrLn handle . centerField . words
-
-myHandleEventHook =
-    fullscreenEventHook <+>
-    handleEventHook def <+>
-    docksEventHook
-
+-- }}}
+myHandleEventHook :: Event -> X All -- {{{
+myHandleEventHook
+      = fullscreenEventHook
+    <+> handleEventHook def
+    <+> docksEventHook
+-- }}}
+myManageHook :: ManageHook -- {{{
 myManageHook = composeAll
     [ namedScratchpadManageHook scratchpads
     , manageDocks
@@ -128,31 +136,61 @@ myManageHook = composeAll
     , composeOne' maybeHooks
     ]
     where
+        -- whenever I decide that workspace names should mean something
+        -- viewShift = doF . liftM2 (.) W.greedyView W.shift
         centerHook = doCenterFloatOffset scrRes borWid panHei
         maybeHooks = manageByClassName centerHook floatClasses
             ++ manageByProp32Exists centerHook floatProp32s
             ++ manageByPropValue centerHook floatPropValues
-            ++ [ isTiled <&&> isNotFixedSize -?> insertPosition Master Newer ]
+            ++ [ isTiled -?> insertPosition Master Newer
+               , isDialog -?> centerHook
+               ]
         floatClasses =
             [ "mpv"
             , "feh"
+            , "Sxiv"
             , "sun-awt-X11-XFramePeer"
-            , "Bluetooth-sendto"
-            , "DDLC" ]
+            , "Bluetooth-sendto" ]
         floatPropValues =
             [ ("WM_WINDOW_ROLE", "GtkFileChooserDialog")
             , ("WM_WINDOW_ROLE", "gimp-message-dialog")
             , ("WM_WINDOW_ROLE", "gimp-toolbox-color-dialog")
+            , ("WM_WINDOW_ROLE", "gimp-query-box")
             , ("WM_WINDOW_ROLE", "file-png")
             , ("WM_NAME", "Friends")
             , ("WM_NAME", "Steam - News")
             , ("WM_NAME", "Discord Updater") ]
         floatProp32s =
             [ "STEAM_GAME" ]
+-- }}}
+myLayoutHook -- {{{ :: (LayoutClass l) => l Window
+    = lessBorders OnlyFloat $ hqLayout ||| fullLayout
 
---------------------------------------------------------- firefox fullscreen fix
+hqLayout
+    = boringWindows
+    . hidden
+    . gaps
+        [ (R, fi horPad), (L, fi horPad)
+        , (U, fi $ verPad + panHei)
+        , (D, fi verPad)
+        ]
+    . spacing (fi winGap)
+    $ HQLayout 2 mratio tratio rsratio
+    where
+        mratio  = 1 - rcratio
+        rcratio = (84 * chaWid + 2 * allgaps) % (scrWid - 2 * horPad)
+        tratio  = (24 * chaHei + 2 * allgaps) % (scrHei - 2 * verPad - panHei)
+        rsratio = 7 % (scrWid - 2 * horPad)
+        allgaps = winGap + borWid + terPad
 
-setSupportedWithFullscreen :: X ()
+fullLayout
+    = noBorders
+    . boringWindows
+    . gaps [(U, fi panHei)]
+    $ Full
+-- }}}
+
+setSupportedWithFullscreen :: X () -- {{{ [ firefox fix ]
 setSupportedWithFullscreen = withDisplay $ \dpy -> do
     r <- asks theRoot
     a <- getAtom "_NET_SUPPORTED"
@@ -170,40 +208,17 @@ setSupportedWithFullscreen = withDisplay $ \dpy -> do
         ,"_NET_WM_STRUT"
         ]
     io $ changeProperty32 dpy r a c propModeReplace (fmap fromIntegral supp)
+-- }}}
 
------------------------------------------------------------------------- layouts
-
-hqLayout = boringWindows
-    . minimize
-    . gaps
-        [ (R, fi horPad), (L, fi horPad)
-        , (U, fi $ verPad + panHei)
-        , (D, fi verPad)
-        ]
-    . spacing (fi winGap)
-    $ HQLayout 2 mratio tratio (7 % scrWid)
-    where
-        mratio = 1 - rcratio
-        rcratio = (84 * chaWid + 2 * allgaps) % (scrWid - 2 * horPad)
-        allgaps = winGap + borWid + terPad
-        tratio = (23 * chaHei + 2 * allgaps) % (scrHei - 2 * verPad - panHei)
-
-fullLayout = noBorders
-    . boringWindows
-    . gaps [(U, fi panHei)]
-    $ Full
-
-myLayoutHook = lessBorders OnlyFloat $ hqLayout ||| fullLayout
-
----------------------------------------------------- keyboard and mouse bindings
-
-myKeyBindings =
-    -- minimizing/restoring/swapping windows
-    [ ((modm, xK_m),                  withFocused minimizeWindow)
-    , ((modm .|. shiftMask, xK_m),    withLastMinimized maximizeWindowAndFocus)
-    , ((modm .|. mod1Mask, xK_m),     withFocused swapWithFirstMinimized)
-    , ((modm .|. mod1Mask, xK_Left),  withFocused swapWithLastMinimized)
-    , ((modm .|. mod1Mask, xK_Right), withFocused swapWithFirstMinimized)
+myKeyBindings -- {{{
+    = -- minimizing/restoring/swapping windows
+    [ ((modm, xK_m),                  withFocused hideWindow)
+    , ((modm .|. mod1Mask, xK_m),     withFocused swapWithNextHidden)
+    , ((modm .|. mod1Mask, xK_j),     withFocused swapWithNextHidden)
+    , ((modm .|. mod1Mask, xK_Right), withFocused swapWithNextHidden)
+    , ((modm .|. mod1Mask, xK_k),     withFocused swapWithLastHidden)
+    , ((modm .|. mod1Mask, xK_Left),  withFocused swapWithLastHidden)
+    , ((modm .|. shiftMask, xK_m),    withLastHidden unhideWindow)
 
     -- cycling through windows
     , ((modm, xK_j), focusDown)
@@ -244,7 +259,7 @@ myKeyBindings =
             , (copy', shiftMask .|. controlMask) ]
     ]
 
-    where
+    where -- {{{
         notSP         = (return $ ("NSP" /=) . W.tag)
         centerWindow  = keysMoveWindowTo (958, 549) (1/2, 1/2)
         centerWindowM = keysMoveWindowTo (650, 549) (1/2, 1/2)
@@ -260,15 +275,18 @@ myKeyBindings =
                 W.peek
             notify "copied window" $ "title: " ++ windowTitle
                                      ++ "\nworkspace: " ++ ws
-
-myMouseBindings =
-    -- allows floating window resizing with mod+right click
+    -- }}}
+-- }}}
+myMouseBindings -- {{{
+    = -- allows floating window resizing with mod+right click
     [ ((modm, button3), (\w -> focus w >> Flex.mouseResizeWindow w))
     ]
-
-myRemovedBindings =
+-- }}}
+myRemovedBindings -- {{{
+    =
     [ (modm, xK_p)               -- default: dmenu_run
     , (modm .|. shiftMask, xK_r) -- default: does this do anything?
     ]
+-- }}}
 
 -- vim: set ts=4 sw=4 expandtab :
