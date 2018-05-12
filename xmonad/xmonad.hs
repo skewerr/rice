@@ -12,23 +12,22 @@ import XMonad.Util.EZConfig
 import XMonad.Util.NamedScratchpad
 import XMonad.Util.XUtils (fi)
 import XMonad.Util.NamedWindows (getName)
-import XMonad.Util.Run
+import XMonad.Util.SpawnNamedPipe
 import XMonad.Layout.NoBorders
 import XMonad.Layout.BoringWindows
--- import XMonad.Layout.Minimize
 import XMonad.Layout.Spacing
 import XMonad.Layout.Gaps
 
 import Text.Printf
+import Control.Monad (join)
 import Data.Ratio
 import Data.Monoid (All)
-import System.IO (Handle)
+import System.IO (hPutStrLn)
 
 import qualified XMonad.Actions.FlexibleResize as Flex
 import qualified XMonad.StackSet as W
 import qualified Data.Map as M
 
--- import XMonad.Actions.Minimize
 import XMonad.Actions.Hidden
 import XMonad.Hooks.ShittyManageHooks
 import XMonad.Layout.Hidden
@@ -53,26 +52,24 @@ modm = mod4Mask
 -- }}}
 
 main :: IO () -- {{{
-main = do
-    xmobarH <- spawnPipe "xmobar"
-    xmonad . ewmh $ def
-        { terminal           = "st -e tmux"
-        , focusFollowsMouse  = True
-        , focusedBorderColor = "#b44c21"
-        , normalBorderColor  = "#656565"
-        , borderWidth        = fi borWid
-        , modMask            = modm
-        , workspaces         = myWorkspaces
-        , startupHook        = myStartupHook
-        , logHook            = myLogHook xmobarH
-        , manageHook         = myManageHook
-        , handleEventHook    = myHandleEventHook
-        , layoutHook         = myLayoutHook
-        }
+main = xmonad . ewmh $ def
+    { terminal           = "st -e tmux"
+    , focusFollowsMouse  = True
+    , focusedBorderColor = "#b44c21"
+    , normalBorderColor  = "#656565"
+    , borderWidth        = fi borWid
+    , modMask            = modm
+    , workspaces         = myWorkspaces
+    , startupHook        = myStartupHook
+    , logHook            = myLogHook
+    , manageHook         = myManageHook
+    , handleEventHook    = myHandleEventHook
+    , layoutHook         = myLayoutHook
+    }
 
-        `additionalKeys`          myKeyBindings
-        `additionalMouseBindings` myMouseBindings
-        `removeKeys`              myRemovedBindings
+    `additionalKeys`          myKeyBindings
+    `additionalMouseBindings` myMouseBindings
+    `removeKeys`              myRemovedBindings
 -- }}}
 
 barPP :: PP -- {{{
@@ -110,9 +107,12 @@ myStartupHook
       = startupHook def
     <+> docksStartupHook
     <+> setSupportedWithFullscreen
+    <+> spawnNamedPipe "xmobar" "xmopipe"
+    <+> join (asks $ logHook . config)
 -- }}}
--- {{{ myLogHook :: Handle -> X ()
-myLogHook xmobarH = do
+myLogHook :: X () -- {{{
+myLogHook = do
+    Just xmobarH <- getNamedPipe "xmopipe"
     dynamicLogWithPP $ barPP { ppOutput = ppOutputF xmobarH }
     updatePointer (0.5, 0.5) (0, 0.25)
     unhideOnFocus
