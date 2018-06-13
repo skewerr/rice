@@ -14,12 +14,13 @@ zstyle ':completion:*' matcher-list '' 'm:{[:lower:][:upper:]}={[:upper:][:lower
 compinit
 # }}}
 
-HISTFILE="/home/spoonm/.cache/zsh/history"
-HISTSIZE=5000
-SAVEHIST=5000
+HISTFILE=~/.zsh_history
+HISTSIZE=1500
+SAVEHIST=3000
 
 stty start '^-' stop '^-'
-setopt interactivecomments
+setopt interactivecomments appendhistory autocd extendedglob nomatch
+unsetopt beep
 
 # {{{ keybinds
 bindkey -e
@@ -37,24 +38,8 @@ bindkey '^[^[[C' forward-word
 # }}}
 # {{{ aliases
 alias git=hub
-alias mpv='DRI_PRIME=1 mpv'
 alias wttr='curl wttr.in/São+Paulo'
 alias ls='ls --color=auto'
-alias fetch='neofetch'
-
-# XDG related
-alias weechat='weechat -d ~/.config/weechat'
-
-# pacaur aliases
-alias prcnsu='pacaur -Rcnsu'
-alias prdd='pacaur -Rdd'
-alias psyu='pacaur -Syu'
-alias pqdtq='pacaur -Qdtq'
-alias pql='pacaur -Ql'
-alias pqs='pacaur -Qs'
-alias pqo='pacaur -Qo'
-alias pqi='pacaur -Qi'
-alias pd='pacaur -d'
 # }}}
 # {{{ functions
 sprunge() {
@@ -75,20 +60,17 @@ ghc() {
 # }}}
 # {{{ xdg
 export XDG_DESKTOP_DIR="$HOME/"
-export XDG_DOCUMENTS_DIR="$HOME/docs/"
-export XDG_DOWNLOAD_DIR="$HOME/dl/"
-export XDG_MUSIC_DIR="$HOME/mus/"
-export XDG_PICTURES_DIR="$HOME/pic/"
-export XDG_VIDEOS_DIR="$HOME/vid/"
+export XDG_DOCUMENTS_DIR="$HOME/documents/"
+export XDG_DOWNLOAD_DIR="$HOME/downloads/"
+export XDG_MUSIC_DIR="$HOME/music/"
+export XDG_PICTURES_DIR="$HOME/pictures/"
+export XDG_VIDEOS_DIR="$HOME/videos/"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_RUNTIME_DIR="/run/user/$UID"
 export XDG_DATA_HOME="$HOME/.local/share"
 # }}}
 # {{{ exports
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
-
 export MAKEFLAGS=-j5
 export CFLAGS=" -O3 -march=native "
 export CXXFLAGS=" -O3 -march=native "
@@ -114,25 +96,6 @@ export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd -Dswing.aatext=true'
 
 # gets rid of unnecessary accessibility thingamajigs
 export NO_AT_BRIDGE=1
-
-#export GTK_IM_MODULE=ibus
-#export QT_IM_MODULE=ibus
-#export XMODIFIERS=@im=ibus
-
-#export GTK_IM_MODULE=uim
-#export QT_IM_MODULE=uim
-#export XMODIFIERS=@im=uim
-
-export GTK_IM_MODULE=fcitx
-export QT_IM_MODULE=fcitx
-export XMODIFIERS=@im=fcitx
-
-#export GTK_IM_MODULE=scim
-#export QT_IM_MODULE=scim
-#export XMODIFIERS=@im=SCIM
-
-# XDG related
-export WEECHAT_HOME="/home/spoonm/.config/weechat"
 # }}}
 
 path+=(
