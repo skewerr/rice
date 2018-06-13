@@ -109,5 +109,6 @@ path+=(
 
 export PATH
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source /usr/share/fzf/completion.zsh
+source /usr/share/fzf/key-bindings.zsh
 source /usr/lib/ruby/gems/2.5.0/gems/tmuxinator-0.11.1/completion/tmuxinator.zsh
