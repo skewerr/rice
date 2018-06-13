@@ -117,7 +117,6 @@ call plug#begin('~/.local/share/nvim/plugged')
 
 	Plug 'zchee/deoplete-jedi'
 	Plug 'zchee/deoplete-zsh'
-	Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
 
 	Plug 'Shougo/neco-syntax'
 	Plug 'Shougo/neco-vim'
