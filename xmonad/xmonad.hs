@@ -43,14 +43,14 @@ import XMonad.Util.Hidden
 
 -- {{{ some constants
 -- TODO: get rid of these
-scrRes@(scrWid, scrHei) = (1920, 1080)
-chaRes@(chaWid, chaHei) = (7, 14)
-(horPad, verPad) = (8, 11)
+scrRes@(scrWid, scrHei) = (1366, 768)
+chaRes@(chaWid, chaHei) = (6, 12)
+(horPad, verPad) = (2, 2)
 
-panHei = 22 -- height of the top panel
+panHei = 20 -- height of the top panel
 borWid =  2 -- border width for the windows
-terPad =  5 -- terminal padding (internal border)
-winGap =  7 -- window margin, will appear twofold
+terPad =  3 -- terminal padding (internal border)
+winGap =  1 -- window margin, will appear twofold
 
 -- }}}
 
@@ -183,9 +183,9 @@ hqLayout
   $ HQLayout 2 mratio tratio rsratio
   where
     mratio  = 1 - rcratio
-    rcratio = (84 * chaWid + 2 * allgaps) % (scrWid - 2 * horPad)
-    tratio  = (24 * chaHei + 2 * allgaps) % (scrHei - 2 * verPad - panHei)
-    rsratio = 7 % (scrWid - 2 * horPad)
+    rcratio = (82 * chaWid + 2 * allgaps) % (scrWid - 2 * horPad)
+    tratio  = (22 * chaHei + 2 * allgaps) % (scrHei - 2 * verPad - panHei)
+    rsratio = chaWid % (scrWid - 2 * horPad)
     allgaps = winGap + borWid + terPad
 
 fullLayout

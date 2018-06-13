@@ -24,10 +24,10 @@ args =
   , "-nf", "#000000"
   , "-sb", "#c0c0c0"
   , "-sf", "#000000"
-  , "-h", "20"
+  , "-h", "18"
   , "-i", "-p", "»"
-  , "-fn", "DejaVu Sans Mono:size=9"
-  , "-fn", "IPAGothic:size=10"
+  , "-fn", "DejaVu Sans Mono:size=8.5"
+  , "-fn", "IPAGothic:size=9"
   ]
 
 goTo :: String -> X ()
