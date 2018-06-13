@@ -1,0 +1,14 @@
+def_key "t"
+	find
+def_key "t"
+	find_item_forward
+
+def_key "j"
+	scroll_down
+def_key "k"
+	scroll_up
+
+def_key "="
+	volume_up
+def_key "+"
+	show_clock

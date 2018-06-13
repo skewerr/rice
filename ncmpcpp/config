@@ -1,0 +1,55 @@
+ncmpcpp_directory = "/home/spoonm/.config/ncmpcpp"
+mpd_music_dir = "/home/spoonm/mus"
+
+visualizer_fifo_path = "/tmp/mpd.fifo"
+visualizer_output_name = "my_fifo"
+visualizer_sync_interval = "30"
+visualizer_in_stereo = "yes"
+visualizer_type = "ellipse"
+#visualizer_look = ●◽
+#visualizer_look = ●│
+#visualizer_look = ●◇
+visualizer_look = │○
+visualizer_color = default
+
+playlist_disable_highlight_delay = 3
+
+song_list_format	= {%a - }{%t}|{%f}
+song_status_format	= {%a - %t}|{%f}
+song_library_format	= {%n - }{%t}|{%f}
+
+now_playing_prefix	= "$2"
+now_playing_suffix	= "$9"
+
+#song_columns_list_format = (22)[]{ar} (1f)[]{nEr} (48)[]{t|f:Title} (30)[]{b} (7f)[]{lr}
+song_columns_list_format = (65)[]{t|f:Title} (35)[black]{br}
+
+titles_visibility = no
+header_visibility = no
+
+#progressbar_color = black
+#progressbar_elapsed_color = black
+#main_window_color = black
+#main_window_highlight_color = black
+#color1 = black
+#color2 = black
+
+progressbar_color = default
+progressbar_elapsed_color = default
+main_window_color = default
+#main_window_highlight_color = default (deprecated?)
+current_item_prefix = "$(default)$r"
+current_item_suffix = "$/r$(end)"
+color1 = default
+color2 = default
+
+#progressbar_look = ─╼
+#progressbar_look = ―→―
+progressbar_look = ―━―
+#progressbar_look = #>
+
+colors_enabled = yes
+mouse_support = no
+autocenter_mode = yes
+centered_cursor = yes
+enable_window_title = no
