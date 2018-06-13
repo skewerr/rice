@@ -1,5 +1,5 @@
 Config
-    { font = "xft:DejaVu Sans Mono:size=9,IPAGothic:size=10,Unifont:size=9"
+    { font = "xft:DejaVu Sans Mono:size=8.5,IPAGothic:size=8.5,Unifont:size=8.5"
 
     , borderColor = "#656565"
     , border = BottomB
@@ -7,13 +7,12 @@ Config
 
     , bgColor = "#ffffff"
     , fgColor = "#000000"
-    , position = Static { xpos = 0, ypos = 0, width = 1920, height = 22 }
+    , position = Static { xpos = 0, ypos = 0, width = 1366, height = 20 }
     , persistent = True
 
     , commands =
         [ Run Date "%A, %B %d ~ %H:%M" "date" 10
         , Run UnsafeStdinReader
-        --, Run PipeReader "/tmp/wtitle.fifo" "wtitle"
 
         , Run Cpu
             [ "-t", "<total>%", "-c", "0", "-w", "2", "-M", "3"
