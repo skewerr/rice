@@ -17,6 +17,8 @@ XF86AudioMute
 
 # music control
 
+XF86AudioStop
+	mpc stop
 XF86AudioPlay
 	mpc toggle
 XF86AudioNext
