@@ -24,6 +24,10 @@ set -g pane-active-border-style fg=default
 
 bind-key -n C-Right next-window
 bind-key -n C-Left  previous-window
+bind-key -n C-j next-window
+bind-key -n C-k  previous-window
+bind-key -n M-j next-window
+bind-key -n M-k  previous-window
 bind-key -n C-n     new-window \; set status on
 
 bind-key -n C-F3    set status
