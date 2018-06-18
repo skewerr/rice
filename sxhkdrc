@@ -1,0 +1,51 @@
+# dmenu
+mod4 + p
+	dmenu_runm
+
+# lock screen
+ctrl + mod4 + l
+	slock
+
+# volume control
+
+XF86AudioLowerVolume
+	volume -d
+XF86AudioRaiseVolume
+	volume -i
+XF86AudioMute
+	volume -m
+
+# music control
+
+XF86AudioPlay
+	mpc toggle
+XF86AudioNext
+	mpc next
+XF86AudioPrev
+	mpc prev
+
+# screenshotting
+
+Print
+	screenshot | ifne upload | ifne clip
+shift + Print
+	screenshot | ifne clip
+ctrl + Print
+	screenshot -s | ifne upload | ifne clip
+shift + ctrl + Print
+	screenshot -s | ifne clip
+
+# recording the screen
+
+mod4 + r
+	record
+shift + mod4 + r
+	record nsnd
+ctrl + mod4 + r
+	record-win
+shift + ctrl + mod4 + r
+	record-win nsnd
+
+# make sxhkd reload its configuration files:
+mod4 + Escape
+	pkill -USR1 -x sxhkd
