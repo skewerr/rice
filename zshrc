@@ -61,12 +61,12 @@ ghc() {
 }
 # }}}
 # {{{ xdg
-export XDG_DESKTOP_DIR="$HOME/"
-export XDG_DOCUMENTS_DIR="$HOME/documents/"
-export XDG_DOWNLOAD_DIR="$HOME/downloads/"
-export XDG_MUSIC_DIR="$HOME/music/"
-export XDG_PICTURES_DIR="$HOME/pictures/"
-export XDG_VIDEOS_DIR="$HOME/videos/"
+export XDG_DESKTOP_DIR="$HOME"
+export XDG_DOCUMENTS_DIR="$HOME/documents"
+export XDG_DOWNLOAD_DIR="$HOME/downloads"
+export XDG_MUSIC_DIR="$HOME/music"
+export XDG_PICTURES_DIR="$HOME/pictures"
+export XDG_VIDEOS_DIR="$HOME/videos"
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_RUNTIME_DIR="/run/user/$UID"
@@ -113,4 +113,4 @@ export PATH
 
 source /usr/share/fzf/completion.zsh
 source /usr/share/fzf/key-bindings.zsh
-source /usr/lib/ruby/gems/2.5.0/gems/tmuxinator-0.11.1/completion/tmuxinator.zsh
+source /usr/lib/ruby/gems/2.5.0/gems/tmuxinator-0.12.0/completion/tmuxinator.zsh

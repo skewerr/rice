@@ -62,7 +62,7 @@ main = xmonad . ewmh $ def
   , normalBorderColor  = "#656565"
   , borderWidth        = fi borWid
   , modMask            = mod4Mask
-  , workspaces         = ["main"]
+  , workspaces         = ["fst", "snd"]
   , startupHook        = myStartupHook
   , logHook            = myLogHook
   , manageHook         = myManageHook
@@ -169,7 +169,7 @@ myManageHook = composeAll
       [ "STEAM_GAME" ]
 -- }}}
 myLayoutHook -- {{{ :: (LayoutClass l) => l Window
-  = lessBorders OnlyFloat $ hqLayout ||| fullLayout
+  = lessBorders OnlyScreenFloat $ hqLayout ||| fullLayout
 
 hqLayout
   = boringWindows

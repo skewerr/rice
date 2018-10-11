@@ -42,11 +42,11 @@ shift + ctrl + Print
 mod4 + r
 	record
 shift + mod4 + r
-	record nsnd
+	record -s
 ctrl + mod4 + r
-	record-win
+	record -l
 shift + ctrl + mod4 + r
-	record-win nsnd
+	record -l -s
 
 # make sxhkd reload its configuration files:
 mod4 + Escape

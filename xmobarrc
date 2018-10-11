@@ -1,5 +1,5 @@
 Config
-    { font = "xft:DejaVu Sans Mono:size=8.5,IPAGothic:size=8.5,Unifont:size=8.5"
+    { font = "xft:DejaVu Sans Mono:size=8.5,IPAGothic:size=8.5,Baekmuk Dotum:size=8.5,Unifont:size=8.5"
 
     , borderColor = "#656565"
     , border = BottomB
@@ -7,8 +7,9 @@ Config
 
     , bgColor = "#ffffff"
     , fgColor = "#000000"
-    , position = Static { xpos = 0, ypos = 0, width = 1366, height = 20 }
-    , persistent = True
+    , position = Static {xpos = 0, ypos = 0, width = 1366, height = 20}
+    -- , persistent = True
+    -- , pickBroadest = True
 
     , commands =
         [ Run Date "%A, %B %d ~ %H:%M" "date" 10

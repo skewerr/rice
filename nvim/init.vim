@@ -65,6 +65,8 @@ call plug#begin('~/.local/share/nvim/plugged')
 	Plug 'wikitopian/hardmode'             " vim hard mode
 	Plug 'thinca/vim-localrc'              " directory specific vimrc
 	Plug 'keith/tmux.vim'                  " .tmux.conf syntax highlighting
+	Plug 'aklt/plantuml-syntax'            " plantuml syntax highlighting
+	Plug 'rhysd/vim-grammarous'            " self explanatory
 	Plug 'ntpeters/vim-better-whitespace'  " self explanatory
 
 		au BufRead * EnableStripWhitespaceOnSave
