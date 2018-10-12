@@ -153,6 +153,7 @@ myManageHook = composeAll
     floatClasses =
       [ "mpv"
       , "feh"
+      , "Pqiv"
       , "Sxiv"
       , "sun-awt-X11-XFramePeer"
       , "Bluetooth-sendto" ]
@@ -230,6 +231,11 @@ myKeyBindings =
   , ("M-i", removeWorkspace)
   ] ++ [
     ("M-" ++ show n, DO.withNthWorkspace W.greedyView (n - 1)) | n <- [1..9]
+  ] ++
+
+  -- border control
+  [ ("M-b", withFocused $ sendMessage . HasBorder False)
+  , ("M-S-b", withFocused $ sendMessage . ResetBorder)
   ] ++
 
   -- hiding, restoring and swapping windows
