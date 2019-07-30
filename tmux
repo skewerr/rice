@@ -4,31 +4,31 @@ set-option -g allow-rename off
 set -g mode-keys vi
 
 set -g status off
+set -g status-fg default
+set -g status-bg default
+set -g status-justify left
 set -g status-position top
 set -g status-left ''
 set -g status-right ''
 
 setw -g window-status-format ' #W '
-setw -g window-status-current-format '#[bg=colour7] #W '
+setw -g window-status-current-format '#[bg=colour8] #W '
 
 # colors
 
-set -g status-bg colour15
-set -g status-fg colour0
-set -g message-fg colour0
-set -g message-bg colour7
 set -g pane-border-style fg=default
 set -g pane-active-border-style fg=default
 
 # keys
 
-bind-key -n C-Right next-window
-bind-key -n C-Left  previous-window
-bind-key -n C-j next-window
-bind-key -n C-k  previous-window
-bind-key -n M-j next-window
-bind-key -n M-k  previous-window
-bind-key -n C-n     new-window \; set status on
+bind-key -n M-d     detach-client
+bind-key -n M-j     next-window
+bind-key -n M-k     previous-window
+bind-key -n M-n     new-window \; set status on
+bind-key -n M-r     command-prompt -I "#W" "rename-window '%%'"
+bind-key -n M-p     choose-tree -Zs
+bind-key -n M-x     run "~/.tmux/plugins/tmux-sessionist/scripts/kill_session_prompt.sh '#{session_name}' '#{session_id}'"
+bind-key -n C-n     run "~/.tmux/plugins/tmux-sessionist/scripts/new_session_prompt.sh"
 
 bind-key -n C-F3    set status
 bind-key -n M-u     run tmux-url-select
@@ -44,6 +44,16 @@ bind -T copy-mode-vi y send -X copy-pipe "xclip -selection c"
 bind -n S-PgUp copy-mode \; send -X halfpage-up
 bind -T copy-mode-vi S-PgUp send -X halfpage-up
 bind -T copy-mode-vi S-PgDn send -X halfpage-down
+
+# these are for sending keys to remote tmux sessions
+
+bind-key -n C-M-d   send-keys M-d
+bind-key -n C-M-j   send-keys M-j
+bind-key -n C-M-k   send-keys M-k
+bind-key -n C-M-n   send-keys M-n
+bind-key -n C-M-r   send-keys M-r
+bind-key -n C-p     send-keys M-p
+bind-key -n C-M-x   send-keys M-x
 
 # plugins
 
