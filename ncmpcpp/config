@@ -22,7 +22,7 @@ now_playing_prefix	= "$2"
 now_playing_suffix	= "$9"
 
 #song_columns_list_format = (22)[]{ar} (1f)[]{nEr} (48)[]{t|f:Title} (30)[]{b} (7f)[]{lr}
-song_columns_list_format = (65)[]{t|f:Title} (35)[black]{br}
+song_columns_list_format = (65)[]{t|f:Title} (35)[]{br}
 
 titles_visibility = no
 header_visibility = no
@@ -47,6 +47,8 @@ color2 = default
 #progressbar_look = ―→―
 progressbar_look = ―━―
 #progressbar_look = #>
+
+follow_now_playing_lyrics = yes
 
 colors_enabled = yes
 mouse_support = no
