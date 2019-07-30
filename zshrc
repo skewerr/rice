@@ -6,6 +6,8 @@ autoload -U zmv
 PROMPT='%n@%M %~
 %(!.#.») '
 
+PS2='  » '
+
 promptinit
 # }}}
 # {{{ completion
@@ -42,6 +44,9 @@ bindkey '^[^[[C' forward-word
 alias git=hub
 alias wttr='curl wttr.in/São+Paulo'
 alias ls='ls --color=auto'
+alias g='BROWSER=links googler --noua'
+alias nc='nvim ~/.config/nvim/init.vim'
+alias ua='update-all'
 # }}}
 # {{{ functions
 sprunge() {
@@ -50,6 +55,15 @@ sprunge() {
     curl -\# -F 'sprunge=<-' sprunge.us <<< "$body" | \
       tr -d '\n' | xclip -selection c
   fi
+}
+
+update-all() {
+  echo "Local update goes first."
+  yay -Syuu
+  for server in akita yamagata odroid; do
+    echo "Updating $server."
+    ssh -t "$server" yay -Syuu
+  done
 }
 
 ghc() {
@@ -83,6 +97,7 @@ export CXXFLAGS=" -O3 -march=native "
 # less related
 export LESSHISTFILE=-
 export LESS="-R -S -# 4"
+export LESSOPEN="|lesspipe.sh %s"
 
 # gpg tty
 export GPG_TTY=$(tty)
@@ -93,6 +108,9 @@ export GOPATH=~/.go
 # nvim is my EDITOR
 export EDITOR=nvim
 
+# firefox is my BROWSER
+export BROWSER=firefox
+
 # fixes blank windows in java programs
 export _JAVA_AWT_WM_NONREPARENTING=1
 
@@ -101,6 +119,9 @@ export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd -Dswing.aatext=true'
 
 # gets rid of unnecessary accessibility thingamajigs
 export NO_AT_BRIDGE=1
+
+# mosh escape character
+export MOSH_ESCAPE_KEY='~'
 # }}}
 
 path+=(
@@ -113,4 +134,12 @@ export PATH
 
 source /usr/share/fzf/completion.zsh
 source /usr/share/fzf/key-bindings.zsh
-source /usr/lib/ruby/gems/2.5.0/gems/tmuxinator-0.12.0/completion/tmuxinator.zsh
+
+source /usr/lib/ruby/gems/2.6.0/gems/tmuxinator-1.1.1/completion/tmuxinator.zsh
+
+source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# changes zsh-autosuggestions highlight
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=7'
+
+# vim: set et ts=2 sw=2 :
