@@ -1,35 +1,32 @@
---------------------------------------------------------------------------------
--- | Does dmenu things with dynamic workspaces.
---------------------------------------------------------------------------------
-
 module XMonad.Actions.DmenuWorkspaces
   ( selectWorkspace
   , moveToWorkspace
   , renameWorkspace
   , removeWorkspace
-  , withNthWorkspace
   , chooseWorkspace
   ) where
 
 import XMonad hiding (workspaces)
 import XMonad.StackSet hiding (filter)
 import qualified XMonad.Actions.DynamicWorkspaces as DW
---import XMonad.Actions.DynamicWorkspaces
 import XMonad.Util.DmenuPrompts
--- import XMonad.Util.WorkspaceCompare (getSortByIndex)
 import XMonad.Actions.DynamicWorkspaceOrder (getSortByOrder, updateName, removeName)
 
+import Data.Maybe
+
+args :: [String]
 args =
-  [ "-nb", "#ffffff"
-  , "-nf", "#000000"
-  , "-sb", "#c0c0c0"
-  , "-sf", "#000000"
+  [ "-nb", "#1d1f21"
+  , "-nf", "#c5c8c6"
+  , "-sb", "#252a2e"
+  , "-sf", "#c5c8c6"
   , "-h", "18"
   , "-i", "-p", "»"
-  , "-fn", "DejaVu Sans Mono:size=8.5"
+  , "-fn", "DejaVu Sans Mono:size=9.1"
   , "-fn", "IPAGothic:size=9"
   ]
 
+-- | Switches to a workspace given its tag. Will create it if it doesn't exist.
 goTo :: String -> X ()
 goTo "" = return ()
 goTo ws = do
@@ -38,6 +35,8 @@ goTo ws = do
     then windows $ greedyView ws
     else DW.addWorkspace ws
 
+-- | Moves a window to a workspace given its tag. Will create it if it doesn't
+-- exist.
 sendTo :: Window -> String -> X ()
 sendTo _  "" = return ()
 sendTo wn ws = do
@@ -45,54 +44,61 @@ sendTo wn ws = do
     DW.addWorkspace ws
   windows $ greedyView ws . shiftWin ws wn
 
+-- | Prompts the user through dmenu and switches to the then chosen workspace.
 selectWorkspace :: X ()
 selectWorkspace = chooseWorkspace >>= goTo
 
+-- | Creates a dmenu prompt with workspace names and returns the chosen name.
 chooseWorkspace :: X String
 chooseWorkspace = workspaceDmenuArgs args
 
+-- | Prompts the user through dmenu and moves the given window to the chosen
+-- workspace.
 moveToWorkspace :: Window -> X ()
-moveToWorkspace w = do
-  chosenWorkspace <- chooseWorkspace
-  sendTo w chosenWorkspace
+moveToWorkspace = (chooseWorkspace >>=) . sendTo
 
+-- | Renames the current workspace by prompting the user through dmenu for a new
+-- workspace tag. No entries are given, as renaming should not be picked from a
+-- list of already used tags.
 renameWorkspace :: X ()
 renameWorkspace = dmenuArgs args [] >>= renameWorkspaceByName
 
-renameWorkspaceByName :: String -> X ()
+-- | Manually updates the current workspace tag in the WindowSet with a given
+-- string.
+setCurrentTag :: WorkspaceId -> WindowSet -> WindowSet
+setCurrentTag tag =
+  let setTag wk = wk { tag = tag }
+      setWsp sc = sc { workspace = setTag (workspace sc) }
+      setScr ws = ws { current = setWsp (current ws) }
+  in setScr
+
+renameWorkspaceByName :: WorkspaceId -> X ()
 renameWorkspaceByName "" = return ()
 renameWorkspaceByName ws = do
-  old <- gets (currentTag . windowset)
-  updateName old ws
-  windows $ \s ->
-    let sett wk = wk { tag = ws }
-        setscr scr = scr { workspace = sett $ workspace scr }
-        sets q = q { current = setscr $ current q }
-     in sets $ removeWorkspace' ws s
+  gets (currentTag . windowset) >>= flip updateName ws
+  windows $ setCurrentTag ws . removeWorkspace' ws
 
-removeWorkspace' :: (Eq i) => i -> StackSet i l a sid sd -> StackSet i l a sid sd
-removeWorkspace' torem s@(StackSet { current = scr@(Screen { workspace = wc })
-                                  , hidden = hs })
-  = let (xs, ys) = break ((== torem) . tag) hs
-     in removeWorkspace'' xs ys
-  where meld Nothing Nothing = Nothing
-        meld x Nothing = x
-        meld Nothing x = x
-        meld (Just x) (Just y) = differentiate (integrate x ++ integrate y)
-        removeWorkspace'' xs (y:ys) = s { current = scr { workspace = wc { stack = meld (stack y) (stack wc) } }
-                                        , hidden = xs ++ ys }
-        removeWorkspace'' _  _      = s
+removeWorkspace' :: WorkspaceId -> WindowSet -> WindowSet
+removeWorkspace' wsp wset = rmWkspc xs ys
+  where
+    (xs, ys) = break ((== wsp) . tag) (hidden wset)
+
+    meld (Just x) (Just y) = differentiate $ integrate x ++ integrate y
+    meld a b | isNothing a = b
+             | otherwise = a
+
+    rmWkspc xs (y:ys) = wset
+      { current = (current wset)
+        { workspace = (workspace $ current wset)
+          { stack = meld (stack y) (stack . workspace $ current wset)
+          }
+        }
+      , hidden = xs ++ ys
+      }
+    rmWkspc _ _ = wset
 
 removeWorkspace :: X ()
 removeWorkspace = do
   tag <- gets (currentTag . windowset)
   DW.removeWorkspace
   removeName tag
-
-withNthWorkspace :: (String -> WindowSet -> WindowSet) -> Int -> X ()
-withNthWorkspace job wnum = do
-  sort <- getSortByOrder
-  ws <- gets (filter (/= "NSP") . map tag . sort . workspaces . windowset)
-  case drop wnum ws of
-    (w:_) -> windows $ job w
-    [] -> return ()

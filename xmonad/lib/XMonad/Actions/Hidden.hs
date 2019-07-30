@@ -17,11 +17,12 @@ module XMonad.Actions.Hidden
   ) where
 
 import XMonad
-import qualified XMonad.StackSet as W
 import XMonad.Util.Hidden
-import qualified XMonad.Layout.BoringWindows as BW
 
-import XMonad.Hooks.ShittyManageHooks (isMasterTile)
+import qualified XMonad.Layout.BoringWindows as BW
+import qualified XMonad.StackSet as W
+
+import Data.Map (notMember)
 import qualified Data.Sequence as S
 
 hideWindowAndAct :: InsertFunc -> Window -> X () -> X ()
@@ -71,7 +72,7 @@ unhideOnFocus = withFocused $ \fwin ->
   whenX (elem fwin <$> getHidden) $
     unhideWindowAndWindows fwin W.swapMaster
 
--- these shall fail is the sequence is empty, but we expect that never to happen
+-- these shall fail if the sequence is empty, but we expect that never to happen
 leftmost  :: (Eq a) => S.Seq a -> a
 rightmost :: (Eq a) => S.Seq a -> a
 leftmost seq  | (l S.:< _) <- S.viewl seq = l
@@ -82,3 +83,11 @@ rightmost seq | (_ S.:> r) <- S.viewr seq = r
 -- this won't fail at all, but yeah, I just needed a delete
 delete :: (Eq a) => a -> S.Seq a -> S.Seq a
 delete x = S.filter (/= x)
+
+-- a query to determine whether a window is tile AND the master window
+isMasterTile :: Query Bool
+isMasterTile = ask >>= \win -> liftX . withWindowSet $ \ws ->
+  let floats = W.floating ws
+      tiled = filter (`notMember` floats) $ W.index ws
+      master = head tiled
+  in return (win == master)

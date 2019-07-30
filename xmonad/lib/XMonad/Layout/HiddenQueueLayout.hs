@@ -20,8 +20,6 @@ import qualified Data.List as L
 import qualified Data.Map as M
 import qualified Data.Sequence as S
 
--- Layout section.
-
 data HiddenQueueLayout a = HQLayout
   { sideWindowsNum :: Int      -- number of windows on the side area
   , masterRatio    :: Rational -- width ratio for the master area
@@ -42,8 +40,8 @@ instance LayoutClass HiddenQueueLayout Window where
       tilesList st | Just nst <- W.filter (`notElem` st) stack = W.integrate nst
                    | otherwise = []
       deleteInd _ [] = []
-      deleteInd i (x:xs) | i == 0 = xs
-                         | otherwise = x : deleteInd (i - 1) xs
+      deleteInd 0 (x:xs) = xs
+      deleteInd i (x:xs) = x : deleteInd (i-1) xs
 
   handleMessage lyt@(HQLayout swnum mratio stratio rratio) msg =
     return $ msum
