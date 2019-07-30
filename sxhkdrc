@@ -43,10 +43,14 @@ mod4 + r
 	record
 shift + mod4 + r
 	record -s
+alt + mod4 + r
+	record -m
 ctrl + mod4 + r
 	record -l
 shift + ctrl + mod4 + r
 	record -l -s
+alt + ctrl + mod4 + r
+	record -l -m
 
 # make sxhkd reload its configuration files:
 mod4 + Escape
