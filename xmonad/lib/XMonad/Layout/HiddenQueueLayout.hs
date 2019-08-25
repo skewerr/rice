@@ -3,45 +3,39 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE TupleSections #-}
 
 module XMonad.Layout.HiddenQueueLayout
   ( HiddenQueueLayout(..)
   ) where
 
 import XMonad hiding (tile)
+import XMonad.Actions.Hidden
+import XMonad.StackSet hiding (visible, delete)
+import XMonad.Util.Hidden
+
 import qualified XMonad.StackSet as W
 import qualified XMonad.Util.ExtensibleState as XS
 
-import XMonad.Util.Hidden
-import XMonad.Actions.Hidden
-
 import Control.Monad (ap, msum, when)
-import qualified Data.List as L
-import qualified Data.Map as M
+import Data.Sequence (Seq(..), (<|))
 import qualified Data.Sequence as S
 
 data HiddenQueueLayout a = HQLayout
-  { sideWindowsNum :: Int      -- number of windows on the side area
-  , masterRatio    :: Rational -- width ratio for the master area
-  , sideTopRatio   :: Rational -- height ratio for the top side window (swn=2)
-  , resizeRatio    :: Rational -- ratio inc/decrement when resizing
+  { sideWindowsNum :: Int      -- ^ Number of windows on the side area.
+  , masterRatio    :: Rational -- ^ Width ratio for the master area.
+  , sideTopRatio   :: Rational -- ^ Height ratio for the top side window.
+  , resizeRatio    :: Rational -- ^ Ratio inc/decrement when resizing.
   } deriving (Show, Read)
 
 instance LayoutClass HiddenQueueLayout Window where
-  doLayout (HQLayout swnum mratio stratio _) rect stack = do
-    tiled <- tilesList <$> getHidden
-    when (length tiled > swnum + 1) $
-      hideWindowAndAct (S.<|) (tiled !! 1) (pure ())
-    let tiled' | length tiled > swnum + 1 = deleteInd 1 tiled
-               | otherwise = tiled
-    return . (\x -> (x, Nothing))
-      . ap zip (tile swnum mratio stratio rect . length) $ tiled'
-    where
-      tilesList st | Just nst <- W.filter (`notElem` st) stack = W.integrate nst
-                   | otherwise = []
-      deleteInd _ [] = []
-      deleteInd 0 (x:xs) = xs
-      deleteInd i (x:xs) = x : deleteInd (i-1) xs
+  doLayout (HQLayout swn mr sr _) rect stack = do
+    visibleTiles <- visible stack <$> getHidden
+    when (length visibleTiles > swn + 1) $
+      hideWindowAndAct (<|) (visibleTiles !! 1) (pure ())
+    let tiled' | length visibleTiles > swn + 1 = delete 1 visibleTiles
+               | otherwise = visibleTiles
+    return . (, Nothing) . ap zip (tile swn mr sr rect . length) $ tiled'
 
   handleMessage lyt@(HQLayout swnum mratio stratio rratio) msg =
     return $ msum
@@ -55,6 +49,7 @@ instance LayoutClass HiddenQueueLayout Window where
 
   description _ = "HQLayout"
 
+-- | TODO: add haddoc for this function
 tile :: Int -> Rational -> Rational -> Rectangle -> Int -> [Rectangle]
 tile 0 _ _ r _ = [r]
 tile 1 m _ r n = drop (2 - n) [r1,r2] where (r1,r2) = splitHorizontallyBy m r
@@ -65,4 +60,13 @@ tile n m _ r w = drop (length (r1:rss) - w) (r1:rss)
   where (r1,rs) = splitHorizontallyBy m r
         rss = splitVertically (w - 1) rs
 
--- vim: set et ts=2 sw=2 :
+-- | Filters hidden windows from a Stack into a list.
+visible :: Stack Window -> Seq Window -> [Window]
+visible s h | Just fs <- W.filter (`notElem` h) s = integrate fs
+            | otherwise = []
+
+-- | Deletes an element of a list given its index.
+delete :: Int -> [a] -> [a]
+delete _ [] = []
+delete 0 (x:xs) = xs
+delete i (x:xs) = x : delete (i - 1) xs

@@ -16,6 +16,7 @@ layoutHook
   = lessBorders OnlyScreenFloat
   . boringWindows
   . onWorkspaces ["web", "gimp"] (fullLayout ||| hiddenQueueLayout)
+  . onWorkspaces ["osu"] fullLayout
   $ hiddenQueueLayout ||| fullLayout
 
 hiddenQueueLayout
@@ -25,6 +26,6 @@ hiddenQueueLayout
          , (D, D.verticalPadding)
          ]
   . spacing D.windowGap
-  $ HQLayout 1 D.masterRatio D.topWindowRatio D.resizeRatio
+  $ HQLayout 2 D.masterRatio D.topWindowRatio D.resizeRatio
 
 fullLayout = noBorders . gaps [(U, D.panelHeight)] $ StateFull

@@ -24,6 +24,7 @@ manageHook = composeAll
   , classNameIn webClassNames --> moveToWorkspace "web"
   , className =? "mpv" --> moveToWorkspace "mpv"
   , className =? "Gimp" --> moveToWorkspace "gimp"
+  , composeOne $ hookPropValues (moveToWorkspace "osu") [("WM_NAME", "osu!")]
   , composeOne $ hookClassNames centerFloat floatClassNames
               ++ hookPropValues centerFloat floatPropValues
               ++ [ isTile -?> insertPosition Master Newer
@@ -32,7 +33,7 @@ manageHook = composeAll
   ]
   where
     webClassNames = ["firefox", "Tor Browser", "qutebrowser"]
-    floatClassNames = ["Pqiv", "sun-awt-X11-XFramePeer"]
+    floatClassNames = ["Pqiv", "sun-awt-X11-XFramePeer", "Udiskie"]
     floatPropValues =
       [ ("WM_WINDOW_ROLE", "GtkFileChooserDialog")
       , ("WM_WINDOW_ROLE", "gimp-message-dialog")

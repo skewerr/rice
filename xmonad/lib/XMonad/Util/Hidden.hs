@@ -12,6 +12,7 @@ module XMonad.Util.Hidden
   ( Hidden(..)
   , InsertFunc
   , modified
+  , hiddenWindows
   , setHidden
   , setNotHidden
   , getHidden
@@ -33,7 +34,7 @@ import Foreign.C.Types (CLong)
 type ModifyFunc = S.Seq Window -> S.Seq Window
 type InsertFunc = Window -> ModifyFunc
 
-data Hidden = Hidden
+newtype Hidden = Hidden
   { hiddenWindows :: S.Seq Window
   } deriving (Eq, Typeable, Read, Show)
 
@@ -42,7 +43,7 @@ instance ExtensionClass Hidden where
   extensionType = PersistentExtension
 
 modified :: ModifyFunc -> X Bool
-modified mf = XS.modified $ \(Hidden oldWs) -> Hidden (mf oldWs)
+modified mf = XS.modified $ Hidden . mf . hiddenWindows
 
 setHidden :: Window -> X ()
 setHidden window = setHiddenState window iconicState (:)

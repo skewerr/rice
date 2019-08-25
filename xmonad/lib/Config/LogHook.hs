@@ -36,7 +36,7 @@ logHook = do
   Just xmobarHandle <- getNamedPipe "xmopipe"
   unhideOnFocus
   updatePointer (0.5, 0.5) (0.5, 0.5)
-  removeWhenEmpty ["gimp", "web", "mpv"]
+  removeWhenEmpty ["gimp", "web", "mpv", "osu"]
   avoidWorkspaces ["NSP"]
   dynamicLogWithPP $
     barPP { ppOutput = hPutStrLn xmobarHandle . centerField . words }

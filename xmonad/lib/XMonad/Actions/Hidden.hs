@@ -1,8 +1,4 @@
-----------------------------------------------------------------------------
--- | Actions to handle hidden windows.
---
--- TODO: support floating windows (need to keep the desired rect)
------------------------------------------------------------------------------
+-- TODO: fix hideWindow(AndAct) behavior, maybe add hideWindowWith
 
 module XMonad.Actions.Hidden
   ( hideWindow
