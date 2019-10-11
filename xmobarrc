@@ -8,8 +8,6 @@ Config
     , bgColor = "#1d1f21"
     , fgColor = "#c5c8c6"
     , position = Static {xpos = 0, ypos = 0, width = 1366, height = 20}
-    -- , persistent = True
-    -- , pickBroadest = True
 
     , commands =
         [ Run Date "%A, %B %d ~ %H:%M" "date" 10
@@ -22,17 +20,17 @@ Config
             [ "-t", "<usedratio>%", "-c", "0", "-w", "2", "-M", "3"
             ] 10
         , Run Battery
-			[ "-t", "<leftipat> <acstatus>", "-c", "0", "-w", "2", "-M", "3"
+            [ "-t", "<leftipat> <left>%", "-c", "0", "-w", "2", "-M", "3"
             , "--"
-            , "--on-icon-pattern", "<icon=.local/share/icons/xpm/bat-ac.xpm/>"
+            , "--on-icon-pattern", "<icon=.local/share/icons/xpm/bat-ch.xpm/>"
             , "--off-icon-pattern", "<icon=.local/share/icons/xpm/bat_%%.xpm/>"
             , "--idle-icon-pattern", "<icon=.local/share/icons/xpm/bat-ac.xpm/>"
-			, "-i", "AC"
-			, "-O", "<left>%"
-            , "-o", "<left>%"
+            , "-p", "green"
             ] 10
         , Run MPD -- TODO: replace this with a script that uses mpc idle
             [ "-t", "<statei> <artist> - <title>"
+            , "-T", "64"
+            , "-E", "..."
             , "--", "-P", "<icon=.local/share/icons/xpm/pause.xpm/>"
             ,       "-Z", "<icon=.local/share/icons/xpm/play.xpm/>"
             ,       "-S", "<icon=.local/share/icons/xpm/stop.xpm/>"
@@ -42,13 +40,13 @@ Config
     , sepChar = "%"
     , alignSep = "}{"
     , template = " \
-    	\<icon=.local/share/icons/xpm/cpu.xpm/> %cpu% \
+        \<icon=.local/share/icons/xpm/cpu.xpm/> %cpu% \
         \<icon=.local/share/icons/xpm/mem.xpm/> %memory% \
         \%battery% <icon=.local/share/icons/xpm/vbar.xpm/> \
         \<action=`mpc toggle`>%mpd%</action> \
-    	\}%UnsafeStdinReader%{ \
-    	\<action=`date-not`>\
+        \}%UnsafeStdinReader%{ \
+        \<action=`date-not`>\
         \<icon=.local/share/icons/xpm/date.xpm/> %date% </action>"
     }
 
--- vim: set filetype=haskell syntax=haskell expandtab :
+-- vim: set filetype=haskell syntax=haskell :
