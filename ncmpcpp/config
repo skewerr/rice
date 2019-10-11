@@ -18,8 +18,8 @@ song_list_format	= {%a - }{%t}|{%f}
 song_status_format	= {%a - %t}|{%f}
 song_library_format	= {%n - }{%t}|{%f}
 
-now_playing_prefix	= "$2"
-now_playing_suffix	= "$9"
+now_playing_prefix	= "$4$b"
+now_playing_suffix	= "$/b$9"
 
 #song_columns_list_format = (22)[]{ar} (1f)[]{nEr} (48)[]{t|f:Title} (30)[]{b} (7f)[]{lr}
 song_columns_list_format = (65)[]{t|f:Title} (35)[]{br}
@@ -45,7 +45,7 @@ color2 = default
 
 #progressbar_look = ─╼
 #progressbar_look = ―→―
-progressbar_look = ―━―
+progressbar_look = ─━─
 #progressbar_look = #>
 
 follow_now_playing_lyrics = yes
