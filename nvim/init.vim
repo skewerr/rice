@@ -8,7 +8,7 @@ set incsearch ruler nohlsearch splitbelow splitright number rnu
 set fillchars+=vert:│,fold:\  backspace=indent,eol,start
 set foldmethod=marker ignorecase smartcase
 set listchars=tab:⏵\ ,trail:· list
-set cursorline
+set cursorline hidden
 
 filetype plugin on
 syntax on
@@ -20,7 +20,7 @@ highlight Todo          ctermfg=15 ctermbg=7
 highlight TabLineFill   term=none  cterm=none ctermbg=none
 highlight TabLine       term=none  cterm=none ctermbg=none
 highlight TabLineSel    term=none  cterm=none ctermbg=8
-highlight VertSplit     term=bold  cterm=none ctermfg=7  ctermbg=0
+highlight VertSplit     term=bold  cterm=none ctermfg=7  ctermbg=none
 highlight StatusLine    term=bold  cterm=bold ctermfg=0  ctermbg=7
 highlight StatusLineNC  term=bold  cterm=none ctermfg=15 ctermbg=0
 highlight Folded        ctermfg=15 ctermbg=0
@@ -31,9 +31,9 @@ highlight SignColumn    ctermbg=none
 call plug#begin('~/.local/share/nvim/plugged')
 
 	" {{{ tpope plugins (eunuch, unimpaired, etc.)
+	Plug 'tpope/vim-repeat'                " better . repetition
 	Plug 'tpope/vim-eunuch'                " unix commands
 	Plug 'tpope/vim-unimpaired'            " some weird operations
-	Plug 'tpope/vim-repeat'                " better . repetition
 	Plug 'tpope/vim-surround'              " surrounding characters
 	Plug 'tpope/vim-fugitive'              " git wrapper
 	Plug 'tpope/vim-commentary'            " comment stuff out and whatnot
@@ -44,6 +44,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 		let g:NERDTreeDirArrowExpandable = '+'
 		let g:NERDTreeDirArrowCollapsible = '-'
 		let g:NERDTreeMinimalUI = 1
+		let g:NERDTreeIgnore = ['\.hi$','\.o$']
 
 	Plug 'Xuyuanp/nerdtree-git-plugin'     " NERDtree git flags
 	" }}}
@@ -72,13 +73,19 @@ call plug#begin('~/.local/share/nvim/plugged')
 	" Plug 'thinca/vim-localrc'              " directory specific vimrc
 	Plug 'keith/tmux.vim'                  " .tmux.conf syntax highlighting
 	" Plug 'aklt/plantuml-syntax'            " plantuml syntax highlighting
-	Plug 'godlygeek/tabular'               " aligning text
+	" Plug 'godlygeek/tabular'               " aligning text DEAD
+	Plug 'junegunn/vim-easy-align'
+
+		xmap ga <Plug>(EasyAlign)
+		nmap ga <Plug>(EasyAlign)
+
 	Plug 'plasticboy/vim-markdown'         " markdown stuff
+	Plug 'dkarter/bullets.vim'
 
 		let g:vim_markdown_folding_disabled = 0
 
 	Plug 'junegunn/goyo.vim'               " make text readable
-	Plug 'rhysd/vim-grammarous'            " self explanatory
+	" Plug 'rhysd/vim-grammarous'            " self explanatory
 	Plug 'ntpeters/vim-better-whitespace'  " self explanatory
 
 		au BufRead * EnableStripWhitespaceOnSave
@@ -88,24 +95,26 @@ call plug#begin('~/.local/share/nvim/plugged')
 		let g:templates_no_autocmd = 1
 		let g:templates_directory = "/home/spoonm/documents/templates"
 
-	Plug 'iamcco/markdown-preview.vim'     " markdown preview
+	" Plug 'iamcco/markdown-preview.vim'     " markdown preview
 
-		let g:mkdp_path_to_chrome = "qutebrowser --target window"
-		let g:mkdp_auto_close = 1
+		" let g:mkdp_path_to_chrome = "qutebrowser --target window"
+		" let g:mkdp_auto_close = 1
 
-	Plug 'iamcco/mathjax-support-for-mkdp' " mathjax support
+	" Plug 'iamcco/mathjax-support-for-mkdp' " mathjax support
 	Plug 'xuhdev/vim-latex-live-preview'   " self explanatory
 		let g:livepreview_previewer = 'zathura'
 		let g:livepreview_engine = 'pandoc'
 
-	Plug 'lervag/vimtex' " LaTeX stuff
+	" Plug 'wlangstroth/vim-racket' " racket stuff
+	Plug 'lervag/vimtex'          " LaTeX stuff
+	" Plug 'neovimhaskell/haskell-vim'
+
 	" {{{ deoplete
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 		let g:deoplete#enable_at_startup = 1
 		let g:deoplete#enable_smart_case = 1
 		let g:deoplete#sources#syntax#min_pattern_length = 3
-
 
 		" {{{ mappings
 		inoremap <expr><C-g>    deoplete#undo_completion()
@@ -134,11 +143,11 @@ call plug#begin('~/.local/share/nvim/plugged')
 		let g:clang_make_default_keymappings = 0
 	" }}}
 	" {{{ vim-javacomplete2
-	Plug 'artur-shaik/vim-javacomplete2'
+	" Plug 'artur-shaik/vim-javacomplete2'
 
-		autocmd FileType java setlocal omnifunc=javacomplete#Complete
-		nmap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
-		imap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
+	" 	autocmd FileType java setlocal omnifunc=javacomplete#Complete
+	" 	nmap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
+	" 	imap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
 	" }}}
 
 	Plug 'zchee/deoplete-jedi'
@@ -148,6 +157,17 @@ call plug#begin('~/.local/share/nvim/plugged')
 	Plug 'Shougo/neco-vim'
 	Plug 'Shougo/neoinclude.vim'
 	Plug 'Shougo/neopairs.vim'
+	Plug 'eagletmt/neco-ghc'
+	" }}}
+
+	" {{{ coc - conquer of completion
+	" Plug 'Shougo/neoinclude.vim'
+	" Plug 'jsfaint/coc-neoinclude'
+	" Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release', 'do': { -> coc#util#install()}}
+
+	" 	" {{{ mappings
+	" 	" }}}
+
 	" }}}
 
 call plug#end()
@@ -164,25 +184,66 @@ inoremap <C-t> 1<C-w>w
 
 " exit the terminal window with Esc
 tnoremap <Esc> <C-\><C-n>
+
+" swap backtick and apostrophe because of stupid keyboard layouts
+noremap ' `
+noremap ` '
 " }}}
 " {{{ character shortcuts
 inoremap emd<Space> —<Space>
 " }}}
 
-augroup neomutt"{{{
+" {{{ some functions
+function! s:IsAnEmptyListItem()
+	return getline('.') =~ '\v^\s*%([-*+]|\d\.)\s*$'
+endfunction
+
+function! s:IsAnEmptyQuote()
+	return getline('.') =~ '\v^\s*(\s?\>)+\s*$'
+endfunction
+
+function! s:Indent(indent)
+	if getline('.') =~ '\v^\s*%([-*+]|\d\.)\s*$'
+		if a:indent
+			normal >>
+		else
+			normal <<
+		endif
+		call setline('.', substitute(getline('.'), '\([-*+]\|\d\.\)\s*$', '\1 ', ''))
+		normal $
+	elseif getline('.') =~ '\v^\s*(\s?\>)+\s*$'
+		if a:indent
+			call setline('.', substitute(getline('.'), '>\s*$', '>> ', ''))
+		else
+			call setline('.', substitute(getline('.'), '\s*>\s*$', ' ', ''))
+			call setline('.', substitute(getline('.'), '^\s\+$', '', ''))
+		endif
+		normal $
+	endif
+endfunction
+" }}}
+
+augroup neomutt "{{{
 	au!
 	au BufRead /tmp/neomutt-* set tw=72 noautoindent filetype=mail
-augroup END"}}}
-augroup html"{{{
+augroup END "}}}
+augroup html "{{{
 	au!
-	au FileType html inoremap <Space><Space> <Esc>/<++><Enter>"_c4l
+	" au FileType html inoremap <Space><Space> <Esc>/<++><Enter>"_c4l
 	au FileType html inoremap ç1 <h1></h1><Esc>F1T>i
 	au FileType html inoremap çp <p></p><Enter><Enter><++><Esc>2ki
 	au FileType html inoremap çb <b></b><Space><++><Esc>FbT>i
-augroup END"}}}
+augroup END "}}}
+augroup haskell "{{{
+	au!
+	au FileType haskell set ts=2 sw=2 et
+augroup END "}}}
+augroup racket "{{{
+	au!
+	au FileType scheme set ts=2 sw=2 et
+augroup END "}}}
 augroup markdown "{{{
 	au!
-" 	au FileType markdown inoremap $$ $$\begin{equation}<Enter>\end{equation}$$<Enter><Enter>++<Esc>2kO
 	au FileType markdown set foldlevelstart=99 foldlevel=3
 
 	au FileType markdown inoremap jj <Esc>/++<Enter>"_c2l
@@ -195,9 +256,14 @@ augroup markdown "{{{
 	au FileType markdown inoremap çsum \sum_{}^{++} ++<Esc>8hi
 	au FileType markdown inoremap çfr \frac{}{++} ++<Esc>7hi
 	au FileType markdown inoremap çif \infty
-	au FileType markdown inoremap forall \forall
-	au FileType markdown inoremap exists \exists
-augroup END"}}}
+	exe 'au FileType markdown inoremap <silent> <buffer> <script> <expr> <Tab>
+		\ <SID>IsAnEmptyListItem() \|\| <SID>IsAnEmptyQuote() ?
+			\ ''<C-O>:call <SID>Indent(1)<CR>'' :' . maparg('<Tab>', 'i')
+	exe 'au FileType markdown inoremap <silent> <buffer> <script> <expr> <S-Tab>
+		\ <SID>IsAnEmptyListItem() \|\| <SID>IsAnEmptyQuote() ?
+			\ ''<C-O>:call <SID>Indent(0)<CR>'' :' . maparg('<S-Tab>', 'i')
+	au FileType markdown set ts=2 sw=2 et
+augroup END "}}}
 
 augroup common " {{{
 	au BufWritePost * if &makeprg != 'make' | make | endif
