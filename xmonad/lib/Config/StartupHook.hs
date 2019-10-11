@@ -6,17 +6,18 @@ import XMonad.Util.SpawnNamedPipe (spawnNamedPipe)
 
 import Control.Monad (join)
 
--- |Come up with a better definition since XMonad's default startupHook might
+-- Come up with a better definition since XMonad's default startupHook might
 -- change from `return ()` at some point.
 startupHook :: X ()
 startupHook
     = docksStartupHook
-  <+> setSupportedWithFullscreen
-  <+> spawnNamedPipe "xmobar" "xmopipe"
-  <+> join (asks $ logHook . config)
+   <> setSupportedWithFullscreen
+   <> spawnNamedPipe "xmobar" "xmopipe"
+   <> join (asks $ logHook . config)
 
--- |This is a way to make Firefox' fullscreen mode work again with XMonad. Check
--- from time to time whether it's still necessary, as EwmhDesktops is updated.
+-- This is a way to make Firefox' fullscreen mode work again with XMonad.  Check
+-- from time to time whether it's still necessary, as EwmhDesktops is
+-- updated.
 setSupportedWithFullscreen :: X ()
 setSupportedWithFullscreen = withDisplay $ \dpy -> do
   r <- asks theRoot

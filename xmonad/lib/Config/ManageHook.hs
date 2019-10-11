@@ -22,7 +22,6 @@ manageHook = composeAll
   [ namedScratchpadManageHook scratchpads
   , manageDocks
   , classNameIn webClassNames --> moveToWorkspace "web"
-  , className =? "mpv" --> moveToWorkspace "mpv"
   , className =? "Gimp" --> moveToWorkspace "gimp"
   , composeOne $ hookPropValues (moveToWorkspace "osu") [("WM_NAME", "osu!")]
   , composeOne $ hookClassNames centerFloat floatClassNames

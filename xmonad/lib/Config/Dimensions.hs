@@ -22,18 +22,18 @@ topWindowRatio = terminalLRatio 22
 rightColumnsRatio = terminalCRatio 81
 masterRatio = 1 - rightColumnsRatio
 
--- |Calculates the horizontal ratio of a terminal window given the number of
+-- | Calculates the horizontal ratio of a terminal window given the number of
 -- columns it should have.
 terminalCRatio :: Integral a => a -> Ratio a
 terminalCRatio columns = horizontalSpan % availableHorizontalSpan
   where horizontalSpan = columns * characterWidth + 2 * commonGap
 
--- |Calculates the vertical ratio of a terminal window given the number of lines
--- it should have.
+-- | Calculates the vertical ratio of a terminal window given the number of
+-- lines it should have.
 terminalLRatio :: Integral a => a -> Ratio a
 terminalLRatio lines = verticalSpan % availableVerticalSpan
   where verticalSpan = lines * characterHeight + 2 * commonGap
 
--- |Calculates the horizontal ratio of a window given its width in pixels.
+-- | Calculates the horizontal ratio of a window given its width in pixels.
 horizontalRatio :: Integral a => a -> Ratio a
 horizontalRatio width = width % availableHorizontalSpan

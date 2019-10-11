@@ -1,11 +1,10 @@
 module Config.LogHook (logHook) where
 
-import XMonad (X(..), WorkspaceId, withWindowSet)
+import XMonad hiding (logHook)
 import XMonad.Actions.Hidden (unhideOnFocus)
 import XMonad.Actions.UpdatePointer
 import XMonad.Hooks.DynamicLog
-import XMonad.Hooks.ManageDocks
-import XMonad.Util.Hidden (withHidden)
+import XMonad.Util.Hidden (withHidden, getHidden)
 import XMonad.Util.SpawnNamedPipe
 
 import qualified XMonad.StackSet as W
@@ -54,5 +53,4 @@ removeWhenEmpty wss = withWorkspace $ \ws ->
   when (isNothing (W.stack ws) && (W.tag ws) `elem` wss) $
     DW.removeWorkspaceByTag $ W.tag ws
 
-withWorkspace action = withWindowSet $ \ws@(W.StackSet { W.current = scr }) ->
-  action $ W.workspace scr
+withWorkspace = (gets (W.workspace . W.current . windowset) >>=)
