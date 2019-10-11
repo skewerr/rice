@@ -5,11 +5,14 @@ module XMonad.Actions.Hidden
   , unhideWindow
   , hideWindowAndAct
   , unhideWindowAndAct
+  , unhideWindowAndWindows
   , unhideOnFocus
   , swapWithLastHidden
   , swapWithNextHidden
   , withLastHidden
   , withNextHidden
+  , rightmost
+  , leftmost
   ) where
 
 import XMonad

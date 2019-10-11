@@ -12,7 +12,6 @@ module XMonad.Util.Hidden
   ( Hidden(..)
   , InsertFunc
   , modified
-  , hiddenWindows
   , setHidden
   , setNotHidden
   , getHidden

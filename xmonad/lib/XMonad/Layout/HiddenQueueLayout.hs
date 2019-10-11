@@ -9,7 +9,7 @@ module XMonad.Layout.HiddenQueueLayout
   ( HiddenQueueLayout(..)
   ) where
 
-import XMonad hiding (tile)
+import XMonad hiding (tile, focus)
 import XMonad.Actions.Hidden
 import XMonad.StackSet hiding (visible, delete)
 import XMonad.Util.Hidden
@@ -29,12 +29,20 @@ data HiddenQueueLayout a = HQLayout
   } deriving (Show, Read)
 
 instance LayoutClass HiddenQueueLayout Window where
-  doLayout (HQLayout swn mr sr _) rect stack = do
-    visibleTiles <- visible stack <$> getHidden
-    when (length visibleTiles > swn + 1) $
-      hideWindowAndAct (<|) (visibleTiles !! 1) (pure ())
-    let tiled' | length visibleTiles > swn + 1 = delete 1 visibleTiles
-               | otherwise = visibleTiles
+  doLayout l@(HQLayout swn mr sr _) rect stack = do
+    hidden <- getHidden
+    fcswin <- gets (W.peek . windowset)
+    let viswin = visible stack hidden
+        shouldHide = length viswin > swn + 1
+        shouldUnhide = hidden /= S.empty && length viswin < swn + 1
+        toUnhide = rightmost hidden
+        tiled' | shouldHide = delete 1 viswin
+               | shouldUnhide = toUnhide : viswin
+               | otherwise = viswin
+    when shouldHide $
+      hideWindowAndAct (<|) (viswin !! 1) (pure ())
+    when shouldUnhide $
+      unhideWindowAndAct toUnhide (pure ())
     return . (, Nothing) . ap zip (tile swn mr sr rect . length) $ tiled'
 
   handleMessage lyt@(HQLayout swnum mratio stratio rratio) msg =
@@ -47,7 +55,7 @@ instance LayoutClass HiddenQueueLayout Window where
       resize Expand = lyt { masterRatio = min 1 (mratio + rratio) }
       incsid (IncMasterN d) = lyt { sideWindowsNum = max 0 (swnum + d) }
 
-  description _ = "HQLayout"
+  description (HQLayout n _ _ _) = "HQLayout " ++ show n
 
 -- | TODO: add haddoc for this function
 tile :: Int -> Rational -> Rational -> Rectangle -> Int -> [Rectangle]
@@ -62,8 +70,7 @@ tile n m _ r w = drop (length (r1:rss) - w) (r1:rss)
 
 -- | Filters hidden windows from a Stack into a list.
 visible :: Stack Window -> Seq Window -> [Window]
-visible s h | Just fs <- W.filter (`notElem` h) s = integrate fs
-            | otherwise = []
+visible s h = integrate' $ W.filter (`notElem` h) s
 
 -- | Deletes an element of a list given its index.
 delete :: Int -> [a] -> [a]
