@@ -1,10 +1,11 @@
 autoload -Uz promptinit
 autoload -Uz compinit
 autoload -U zmv
+# autoload -U colors && colors
 
 # {{{ prompt
-PROMPT='%n@%M %~
-%(!.#.») '
+PROMPT="%F{11}%n %F{12}%M %F{10}%~%f
+%(!.#.») "
 
 PS2='  » '
 
@@ -42,13 +43,15 @@ bindkey '^[^[[C' forward-word
 # }}}
 # {{{ aliases
 alias git=hub
-alias wttr='curl wttr.in/São+Paulo'
 alias ls='ls --color=auto'
 alias g='BROWSER=links googler --noua'
 alias nc='nvim ~/.config/nvim/init.vim'
-alias ua='update-all'
 # }}}
 # {{{ functions
+share() {
+  scp "$1" chiba:/var/www/share/"$2"
+}
+
 sprunge() {
   [[ -n "$1" ]] && local body="$(< $1)"  || local body="$(cat)"
   if [[ $(wc -c <<< "$body" | sed 's/^ *//') -gt 0 ]]; then
@@ -57,20 +60,33 @@ sprunge() {
   fi
 }
 
-update-all() {
-  echo "Local update goes first."
-  yay -Syuu
-  for server in akita yamagata odroid; do
-    echo "Updating $server."
-    ssh -t "$server" yay -Syuu
-  done
-}
-
 ghc() {
   if [[ -e ".ghc" ]]; then
     ./.ghc "$@"
   else
     command ghc "$@"
+  fi
+}
+
+mosh() {
+  case "$1" in
+    (akita|chiba|yamagata) )
+      command mosh "$1" -- tmuxinator start master
+      ;;
+    odroid)
+      command mosh root@"$1" -- tmuxinator start master
+      ;;
+    *)
+      echo "Unrecognized target. Available: yamagata akita odroid chiba"
+  esac
+}
+
+mpv() {
+  currentDesktop="$(wmdesk)"
+  if [ "$currentDesktop" = "anime" ]; then
+    command mpv --fs "$@"
+  else
+    command mpv "$@"
   fi
 }
 # }}}
