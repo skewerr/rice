@@ -3,13 +3,13 @@ set-option -g allow-rename off
 
 set -g mode-keys vi
 
-set -g status off
+set -g status on
 set -g status-fg default
 set -g status-bg default
 set -g status-justify left
 set -g status-position top
 set -g status-left ''
-set -g status-right ''
+set -g status-right ' #[fg=colour7]#S'
 
 setw -g window-status-format ' #W '
 setw -g window-status-current-format '#[bg=colour8] #W '
