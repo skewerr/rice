@@ -69,11 +69,8 @@ call plug#begin('~/.local/share/nvim/plugged')
 		highlight ALEErrorSign   ctermbg=1    ctermfg=15
 	" }}}
 
-	" Plug 'wikitopian/hardmode'             " vim hard mode
 	" Plug 'thinca/vim-localrc'              " directory specific vimrc
 	Plug 'keith/tmux.vim'                  " .tmux.conf syntax highlighting
-	" Plug 'aklt/plantuml-syntax'            " plantuml syntax highlighting
-	" Plug 'godlygeek/tabular'               " aligning text DEAD
 	Plug 'junegunn/vim-easy-align'
 
 		xmap ga <Plug>(EasyAlign)
@@ -95,12 +92,6 @@ call plug#begin('~/.local/share/nvim/plugged')
 		let g:templates_no_autocmd = 1
 		let g:templates_directory = "/home/spoonm/documents/templates"
 
-	" Plug 'iamcco/markdown-preview.vim'     " markdown preview
-
-		" let g:mkdp_path_to_chrome = "qutebrowser --target window"
-		" let g:mkdp_auto_close = 1
-
-	" Plug 'iamcco/mathjax-support-for-mkdp' " mathjax support
 	Plug 'xuhdev/vim-latex-live-preview'   " self explanatory
 		let g:livepreview_previewer = 'zathura'
 		let g:livepreview_engine = 'pandoc'
@@ -142,13 +133,6 @@ call plug#begin('~/.local/share/nvim/plugged')
 		let g:clang_library_path = '/usr/lib/libclang.so'
 		let g:clang_make_default_keymappings = 0
 	" }}}
-	" {{{ vim-javacomplete2
-	" Plug 'artur-shaik/vim-javacomplete2'
-
-	" 	autocmd FileType java setlocal omnifunc=javacomplete#Complete
-	" 	nmap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
-	" 	imap <F7> <Plug>(JavaComplete-Imports-RemoveUnused)
-	" }}}
 
 	Plug 'zchee/deoplete-jedi'
 	Plug 'zchee/deoplete-zsh'
@@ -158,16 +142,6 @@ call plug#begin('~/.local/share/nvim/plugged')
 	Plug 'Shougo/neoinclude.vim'
 	Plug 'Shougo/neopairs.vim'
 	Plug 'eagletmt/neco-ghc'
-	" }}}
-
-	" {{{ coc - conquer of completion
-	" Plug 'Shougo/neoinclude.vim'
-	" Plug 'jsfaint/coc-neoinclude'
-	" Plug 'neoclide/coc.nvim', {'tag': '*', 'branch': 'release', 'do': { -> coc#util#install()}}
-
-	" 	" {{{ mappings
-	" 	" }}}
-
 	" }}}
 
 call plug#end()
@@ -227,13 +201,6 @@ augroup neomutt "{{{
 	au!
 	au BufRead /tmp/neomutt-* set tw=72 noautoindent filetype=mail
 augroup END "}}}
-augroup html "{{{
-	au!
-	" au FileType html inoremap <Space><Space> <Esc>/<++><Enter>"_c4l
-	au FileType html inoremap ç1 <h1></h1><Esc>F1T>i
-	au FileType html inoremap çp <p></p><Enter><Enter><++><Esc>2ki
-	au FileType html inoremap çb <b></b><Space><++><Esc>FbT>i
-augroup END "}}}
 augroup haskell "{{{
 	au!
 	au FileType haskell set ts=2 sw=2 et
@@ -245,11 +212,8 @@ augroup END "}}}
 augroup markdown "{{{
 	au!
 	au FileType markdown set foldlevelstart=99 foldlevel=3
-
 	au FileType markdown inoremap jj <Esc>/++<Enter>"_c2l
 	au FileType markdown inoremap kk <Esc>?++<Enter>"_c2l
-	" au FileType markdown inoremap çi ** ++<Esc>3hi
-	" au FileType markdown inoremap çb **** ++<Esc>4hi
 	au FileType markdown inoremap al$ $$\begin{aligned}<Enter>\end{aligned}$$<Enter><Enter>++<Esc>2kO
 	au FileType markdown inoremap çint \int_{}^{++} ++<Esc>8hi
 	au FileType markdown inoremap çlim \lim_{} ++<Esc>3hi
