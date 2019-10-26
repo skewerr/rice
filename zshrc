@@ -1,11 +1,20 @@
 autoload -Uz promptinit
 autoload -Uz compinit
+autoload -Uz vcs_info
 autoload -U zmv
-# autoload -U colors && colors
+
+precmd() {
+  vcs_info
+}
+
+zstyle ':vcs_info:git:*' formats '→ %F{14}%b%f'
+zstyle ':vcs_info:git:*' actionformats '→ %F{14}%b %F{13}%a%f'
 
 # {{{ prompt
-PROMPT="%F{11}%n %F{12}%M %F{10}%~%f
-%(!.#.») "
+setopt prompt_subst
+
+PROMPT='%F{11}%n %F{12}%M %F{10}%~%f ${vcs_info_msg_0_}
+%(!.#.») '
 
 PS2='  » '
 
