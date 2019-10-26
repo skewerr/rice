@@ -103,8 +103,8 @@ export XDG_RUNTIME_DIR="/run/user/$UID"
 export XDG_DATA_HOME="$HOME/.local/share"
 # }}}
 # {{{ exports
-export CC=/usr/bin/clang
-export CXX=/usr/bin/clang++
+export CC=/usr/bin/gcc
+export CXX=/usr/bin/g++
 
 export MAKEFLAGS=-j5
 export CFLAGS=" -O3 -march=native "
