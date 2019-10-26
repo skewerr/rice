@@ -29,4 +29,4 @@ main = xmonad . ewmh $ def
   `additionalMouseBindings` BD.mouseBindings
   `removeKeysP`             BD.removedBindings
 
--- vim: set ts=2 sw=2 et makeprg=xmonad\ --recompile :
+-- vim: set ts=2 sw=2 et :
