@@ -3,7 +3,7 @@ mod4 + p
 	dmenu_runm
 
 # lock screen
-ctrl + mod4 + l
+mod4 + XF86Forward
 	slock
 
 # volume control
