@@ -16,7 +16,6 @@ layoutHook
   . boringWindows
   . onWorkspaces ["anime"] animeLayout
   . onWorkspaces ["web", "gimp"] (fullLayout ||| hiddenQueueLayout)
-  . onWorkspaces ["osu"] fullLayout
   $ hiddenQueueLayout ||| fullLayout
 
 hiddenQueueLayout
