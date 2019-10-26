@@ -17,7 +17,7 @@ main = xmonad . ewmh $ def
   , focusedBorderColor = "#a54242"
   , normalBorderColor  = "#656565"
   , modMask            = mod4Mask
-  , workspaces         = ["main"]
+  , workspaces         = ["home"]
   , borderWidth        = D.borderWidth
   , startupHook        = SH.startupHook
   , logHook            = LH.logHook
@@ -29,4 +29,4 @@ main = xmonad . ewmh $ def
   `additionalMouseBindings` BD.mouseBindings
   `removeKeysP`             BD.removedBindings
 
--- vim: set ts=2 sw=2 et :
+-- vim: set ts=2 sw=2 et makeprg=xmonad\ --recompile :
