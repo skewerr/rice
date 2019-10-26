@@ -7,7 +7,6 @@ module XMonad.Util.DmenuPrompts where
 
 import XMonad hiding (workspaces)
 import XMonad.StackSet (workspaces, tag)
--- import XMonad.Util.WorkspaceCompare (getSortByIndex)
 import XMonad.Actions.DynamicWorkspaceOrder (getSortByOrder)
 
 import System.IO
