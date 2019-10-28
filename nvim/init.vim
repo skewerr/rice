@@ -2,7 +2,7 @@ set nocompatible
 set background=dark
 set smartindent noexpandtab tabstop=4 shiftwidth=4 textwidth=80
 set scrolloff=15 sidescrolloff=5 updatetime=750
-set laststatus=1 fo+=t
+set laststatus=2 fo+=t
 set ttimeoutlen=0
 set incsearch ruler nohlsearch splitbelow splitright number rnu
 set fillchars+=vert:\ ,fold:\  backspace=indent,eol,start
@@ -21,11 +21,12 @@ highlight TabLineFill   term=none  cterm=none ctermbg=none
 highlight TabLine       term=none  cterm=none ctermbg=none
 highlight TabLineSel    term=none  cterm=none ctermbg=8
 highlight VertSplit     term=bold  cterm=none ctermfg=7  ctermbg=none
-highlight StatusLine    term=bold  cterm=bold ctermfg=0  ctermbg=7
-highlight StatusLineNC  term=bold  cterm=none ctermfg=15 ctermbg=0
+highlight StatusLine    term=none  cterm=bold ctermfg=0  ctermbg=7
+highlight StatusLineNC  term=none  cterm=none ctermfg=none ctermbg=0
 highlight Folded        ctermfg=15 ctermbg=0
 highlight CursorLine    cterm=none ctermbg=0
 highlight SignColumn    ctermbg=none
+highlight FileName      ctermfg=0 ctermbg=7
 " }}}
 " {{{ plugins
 call plug#begin('~/.local/share/nvim/plugged')
@@ -168,6 +169,17 @@ inoremap emd<Space> —<Space>
 " }}}
 
 " {{{ some functions
+function CurrentGitBranch()
+	let output = system(
+				\ 'git status --porcelain -b ' . shellescape(expand('%')) . ' 2>/dev/null'
+				\. '|tr . '' '' | sed 1q | awk ''{print $2}'' | tr -d ''\n''')
+	if len(output) > 0
+		let b:gitbranch = '  ' . l:output . ' '
+	else
+		let b:gitbranch = ''
+	endif
+endfunction
+
 function! s:IsAnEmptyListItem()
 	return getline('.') =~ '\v^\s*%([-*+]|\d\.)\s*$'
 endfunction
@@ -195,6 +207,15 @@ function! s:Indent(indent)
 		normal $
 	endif
 endfunction
+" }}}
+" {{{ the status line
+set statusline=
+set statusline+=%#PmenuSel#
+set statusline+=%{b:gitbranch}
+set statusline+=%#FileName#
+set statusline+=\ %<%f\ %m\ %=
+set statusline+=%#PmenuSel#
+set statusline+=\ %y\ %6(L%l%)\ %-6(C%v%)\ %P\ %{''}
 " }}}
 
 augroup neomutt "{{{
@@ -231,6 +252,7 @@ augroup END "}}}
 
 augroup common " {{{
 	au BufWritePost * if &makeprg != 'make' | make | endif
+	au BufEnter,BufWritePost * call CurrentGitBranch()
 augroup END " }}}
 
 " vim: set ts=2 sw=2 noet foldmethod=marker :
