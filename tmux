@@ -1,5 +1,6 @@
 set-option -g default-terminal "tmux-256color"
 set-option -g allow-rename off
+set-option -g default-size 142x59
 
 set -g mode-keys vi
 
