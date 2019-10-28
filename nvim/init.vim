@@ -5,7 +5,7 @@ set scrolloff=15 sidescrolloff=5 updatetime=750
 set laststatus=1 fo+=t
 set ttimeoutlen=0
 set incsearch ruler nohlsearch splitbelow splitright number rnu
-set fillchars+=vert:│,fold:\  backspace=indent,eol,start
+set fillchars+=vert:\ ,fold:\  backspace=indent,eol,start
 set foldmethod=marker ignorecase smartcase
 set listchars=tab:⏵\ ,trail:· list
 set cursorline hidden
