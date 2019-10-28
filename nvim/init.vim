@@ -26,7 +26,7 @@ highlight StatusLineNC  term=none  cterm=none ctermfg=none ctermbg=0
 highlight Folded        ctermfg=15 ctermbg=0
 highlight CursorLine    cterm=none ctermbg=0
 highlight SignColumn    ctermbg=none
-highlight FileName      ctermfg=0 ctermbg=7
+highlight FileName      ctermfg=12 ctermbg=0
 " }}}
 " {{{ plugins
 call plug#begin('~/.local/share/nvim/plugged')
@@ -169,7 +169,7 @@ inoremap emd<Space> —<Space>
 " }}}
 
 " {{{ some functions
-function CurrentGitBranch()
+function! CurrentGitBranch()
 	let output = system(
 				\ 'git status --porcelain -b ' . shellescape(expand('%')) . ' 2>/dev/null'
 				\. '|tr . '' '' | sed 1q | awk ''{print $2}'' | tr -d ''\n''')
