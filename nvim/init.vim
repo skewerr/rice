@@ -221,6 +221,7 @@ set statusline+=\ %y\ %6(L%l%)\ %-6(C%v%)\ %P\ %{''}
 augroup neomutt "{{{
 	au!
 	au BufRead /tmp/neomutt-* set tw=72 noautoindent filetype=mail
+	au BufRead /tmp/neomutt-* DisableStripWhitespaceOnSave
 augroup END "}}}
 augroup haskell "{{{
 	au!
