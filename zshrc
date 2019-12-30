@@ -38,8 +38,8 @@ compinit
 # }}}
 
 HISTFILE=~/.zsh_history
-HISTSIZE=1500
-SAVEHIST=3000
+HISTSIZE=10000
+SAVEHIST=20000
 
 stty start '^-' stop '^-'
 setopt interactivecomments appendhistory autocd extendedglob nomatch
