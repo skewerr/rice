@@ -14,18 +14,6 @@ import XMonad.Actions.DynamicWorkspaceOrder (getSortByOrder, updateName, removeN
 
 import Data.Maybe
 
-args :: [String]
-args =
-  [ "-nb", "#1d1f21"
-  , "-nf", "#c5c8c6"
-  , "-sb", "#252a2e"
-  , "-sf", "#c5c8c6"
-  , "-h", "18"
-  , "-i", "-p", "»"
-  , "-fn", "DejaVu Sans Mono:size=9.1"
-  , "-fn", "IPAGothic:size=9"
-  ]
-
 -- | Switches to a workspace given its tag. Will create it if it doesn't exist.
 goTo :: String -> X ()
 goTo "" = return ()
@@ -50,7 +38,7 @@ selectWorkspace = chooseWorkspace >>= goTo
 
 -- | Creates a dmenu prompt with workspace names and returns the chosen name.
 chooseWorkspace :: X String
-chooseWorkspace = workspaceDmenuArgs args
+chooseWorkspace = workspaceDmenu
 
 -- | Prompts the user through dmenu and moves the given window to the chosen
 -- workspace.
@@ -61,7 +49,7 @@ moveToWorkspace = (chooseWorkspace >>=) . sendTo
 -- workspace tag. No entries are given, as renaming should not be picked from a
 -- list of already used tags.
 renameWorkspace :: X ()
-renameWorkspace = dmenuArgs args [] >>= renameWorkspaceByName
+renameWorkspace = dmenuArgs [] [] >>= renameWorkspaceByName
 
 -- | Manually updates the current workspace tag in the WindowSet with a given
 -- string.

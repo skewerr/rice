@@ -1,6 +1,6 @@
 # dmenu
 mod4 + p
-	dmenu_runm
+	dmenu_run
 
 # lock screen
 mod4 + XF86Forward
