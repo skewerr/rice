@@ -166,6 +166,7 @@ noremap ` '
 " }}}
 " {{{ character shortcuts
 inoremap emd<Space> —<Space>
+inoremap lbda<Space> λ<Space>
 " }}}
 
 " {{{ some functions
