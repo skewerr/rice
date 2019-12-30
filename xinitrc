@@ -10,7 +10,7 @@ xmodmap ~/.Xmodmap
 xbanish -i mod4 &
 dunst -config ~/.config/dunst/dunstrc &
 sxhkd &
-compton -b
+picom -b
 fcitx -d
 
 udiskie &
