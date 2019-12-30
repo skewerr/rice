@@ -98,7 +98,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 		let g:livepreview_engine = 'pandoc'
 
 	" Plug 'wlangstroth/vim-racket' " racket stuff
-	Plug 'lervag/vimtex'          " LaTeX stuff
+	" Plug 'lervag/vimtex'          " LaTeX stuff
 	" Plug 'neovimhaskell/haskell-vim'
 
 	" {{{ deoplete
