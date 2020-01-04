@@ -1,4 +1,5 @@
 set-option -g default-terminal "tmux-256color"
+set-option -g -a terminal-overrides ',*:Se=\E[4 q'
 set-option -g allow-rename off
 set-option -g default-size 142x59
 
