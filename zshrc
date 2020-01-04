@@ -171,7 +171,7 @@ export PATH
 source /usr/share/fzf/completion.zsh
 source /usr/share/fzf/key-bindings.zsh
 
-source /usr/lib/ruby/gems/2.6.0/gems/tmuxinator-1.1.3/completion/tmuxinator.zsh
+source /usr/lib/ruby/gems/2.6.0/gems/tmuxinator-1.1.4/completion/tmuxinator.zsh
 
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 
