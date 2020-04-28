@@ -62,6 +62,7 @@ bindkey '^[^[[D' backward-word
 bindkey '^[^[[C' forward-word
 # }}}
 # {{{ aliases
+alias monad=xmonad
 alias git=hub
 alias ls='ls --color=auto'
 alias g='BROWSER=links googler --noua'
