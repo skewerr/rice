@@ -10,7 +10,7 @@ Config
     , position = Static {xpos = 0, ypos = 0, width = 1366, height = 20}
 
     , commands =
-        [ Run Date "%A, %B %d ~ %H:%M" "date" 10
+        [ Run DateZone "%A, %B %d日 ~ %H:%M" "ja_JP.UTF-8" "" "date" 10
         , Run UnsafeStdinReader
 
         , Run Cpu
