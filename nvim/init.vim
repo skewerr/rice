@@ -106,8 +106,6 @@ call plug#begin('~/.local/share/nvim/plugged')
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 		let g:deoplete#enable_at_startup = 1
-		let g:deoplete#enable_smart_case = 1
-		let g:deoplete#sources#syntax#min_pattern_length = 3
 
 		" {{{ mappings
 		inoremap <expr><C-g>    deoplete#undo_completion()
@@ -149,6 +147,10 @@ call plug#begin('~/.local/share/nvim/plugged')
 call plug#end()
 call deoplete#custom#source('_', 'matchers', ['matcher_full_fuzzy'])
 call deoplete#custom#option('ignore_sources', {'_':['buffer']})
+call deoplete#custom#option({
+\ 'min_pattern_length': 3,
+\ 'smart_case': v:true,
+\ })
 " }}}
 " {{{ mappings
 " close/open current fold
