@@ -50,26 +50,26 @@ call plug#begin('~/.local/share/nvim/plugged')
 
 	Plug 'Xuyuanp/nerdtree-git-plugin'     " NERDtree git flags
 	" }}}
-	" {{{ ALE
-	Plug 'w0rp/ale'
+	" " {{{ ALE
+	" Plug 'w0rp/ale'
 
-		let g:ale_enabled = 0
-		let g:ale_sign_column_always = 1
-		let g:ale_linters = {
-		\	'c': ['clang'],
-		\	'haskell': []
-		\}
-		let g:ale_c_clang_options = '-std=c99 -Wall'
-		let g:ale_lint_on_save = 1
-		" let g:ale_lint_on_text_changed = 'always'
-		let g:ale_lint_delay = 500
+	" 	let g:ale_enabled = 0
+	" 	let g:ale_sign_column_always = 1
+	" 	let g:ale_linters = {
+	" 	\	'c': ['clang'],
+	" 	\	'haskell': []
+	" 	\}
+	" 	let g:ale_c_clang_options = '-std=c99 -Wall'
+	" 	let g:ale_lint_on_save = 1
+	" 	" let g:ale_lint_on_text_changed = 'always'
+	" 	let g:ale_lint_delay = 500
 
-		nmap     <silent> <C-k> <Plug>(ale_previous_wrap)
-		nmap     <silent> <C-j> <Plug>(ale_next_wrap)
+	" 	nmap     <silent> <C-k> <Plug>(ale_previous_wrap)
+	" 	nmap     <silent> <C-j> <Plug>(ale_next_wrap)
 
-		highlight ALEWarningSign ctermbg=none ctermfg=12
-		highlight ALEErrorSign   ctermbg=1    ctermfg=15
-	" }}}
+	" 	highlight ALEWarningSign ctermbg=none ctermfg=12
+	" 	highlight ALEErrorSign   ctermbg=1    ctermfg=15
+	" " }}}
 
 	" Plug 'thinca/vim-localrc'              " directory specific vimrc
 	Plug 'keith/tmux.vim'                  " .tmux.conf syntax highlighting
@@ -94,9 +94,9 @@ call plug#begin('~/.local/share/nvim/plugged')
 		let g:templates_no_autocmd = 1
 		let g:templates_directory = "/home/spoonm/documents/templates"
 
-	Plug 'xuhdev/vim-latex-live-preview'   " self explanatory
-		let g:livepreview_previewer = 'zathura'
-		let g:livepreview_engine = 'pandoc'
+	" Plug 'xuhdev/vim-latex-live-preview'   " self explanatory
+	" 	let g:livepreview_previewer = 'zathura'
+	" 	let g:livepreview_engine = 'pandoc'
 
 	" Plug 'wlangstroth/vim-racket' " racket stuff
 	" Plug 'lervag/vimtex'          " LaTeX stuff
