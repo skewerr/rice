@@ -29,7 +29,7 @@ manageHook = composeAll
                  , isDialog -?> centerFloat ]
   ]
   where
-    webClassNames = ["firefox", "Tor Browser"]
+    webClassNames = ["firefox", "Tor Browser", "discord"]
     floatClassNames = ["Pqiv", "sun-awt-X11-XFramePeer", "Udiskie"]
     floatPropValues =
       [ ("WM_WINDOW_ROLE", "GtkFileChooserDialog")
