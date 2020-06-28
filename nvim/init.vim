@@ -258,6 +258,7 @@ augroup END "}}}
 augroup common " {{{
 	au BufWritePost * if &makeprg != 'make' | make | endif
 	au BufEnter,BufWritePost * call CurrentGitBranch()
+	au VimLeave * set guicursor=a:hor20
 augroup END " }}}
 
 " vim: set ts=2 sw=2 noet foldmethod=marker :
