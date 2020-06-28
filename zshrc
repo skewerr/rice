@@ -162,6 +162,8 @@ path+=(
   "/home/spoonm/.local/bin"
   "/home/spoonm/.cabal/bin"
   "/home/spoonm/.go/bin"
+  "/home/spoonm/.gem/ruby/2.6.0/bin"
+  "/home/spoonm/.gem/ruby/2.7.0/bin"
 )
 
 export PATH
