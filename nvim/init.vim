@@ -9,6 +9,7 @@ set fillchars+=vert:\ ,fold:\  backspace=indent,eol,start
 set foldmethod=marker ignorecase smartcase
 set listchars=tab:⏵\ ,trail:· list
 set cursorline hidden
+set wildignore=*.o,*.ho,*.hi,*.pdf,*.obj,*.jpg,*.png
 
 filetype plugin on
 syntax on
