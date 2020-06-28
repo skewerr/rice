@@ -70,7 +70,7 @@ alias nc='nvim ~/.config/nvim/init.vim'
 # }}}
 # {{{ functions
 share() {
-  scp "$1" chiba:/var/www/share/"$2"
+  scp -r "$1" gunma:/var/www/share/"$2"
 }
 
 sprunge() {
@@ -91,14 +91,11 @@ ghc() {
 
 mosh() {
   case "$1" in
-    (akita|chiba|yamagata) )
+    (akita|chiba|yamagata|gunma|odroid) )
       command mosh "$1" -- tmuxinator start master
       ;;
-    odroid)
-      command mosh root@"$1" -- tmuxinator start master
-      ;;
     *)
-      echo "Unrecognized target. Available: yamagata akita odroid chiba"
+      command mosh "$@"
   esac
 }
 
