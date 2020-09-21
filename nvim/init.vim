@@ -51,24 +51,24 @@ call plug#begin('~/.local/share/nvim/plugged')
 	Plug 'Xuyuanp/nerdtree-git-plugin'     " NERDtree git flags
 	" }}}
 	" " {{{ ALE
-	" Plug 'w0rp/ale'
+	Plug 'w0rp/ale'
 
-	" 	let g:ale_enabled = 0
-	" 	let g:ale_sign_column_always = 1
-	" 	let g:ale_linters = {
-	" 	\	'c': ['clang'],
-	" 	\	'haskell': []
-	" 	\}
-	" 	let g:ale_c_clang_options = '-std=c99 -Wall'
-	" 	let g:ale_lint_on_save = 1
-	" 	" let g:ale_lint_on_text_changed = 'always'
-	" 	let g:ale_lint_delay = 500
+		let g:ale_enabled = 0
+		let g:ale_sign_column_always = 1
+		let g:ale_linters = {
+		\	'c': ['clang'],
+		\	'haskell': []
+		\}
+		let g:ale_c_clang_options = '-std=c99 -Wall'
+		let g:ale_lint_on_save = 1
+		" let g:ale_lint_on_text_changed = 'always'
+		let g:ale_lint_delay = 500
 
-	" 	nmap     <silent> <C-k> <Plug>(ale_previous_wrap)
-	" 	nmap     <silent> <C-j> <Plug>(ale_next_wrap)
+		nmap     <silent> <C-k> <Plug>(ale_previous_wrap)
+		nmap     <silent> <C-j> <Plug>(ale_next_wrap)
 
-	" 	highlight ALEWarningSign ctermbg=none ctermfg=12
-	" 	highlight ALEErrorSign   ctermbg=1    ctermfg=15
+		highlight ALEWarningSign ctermbg=none ctermfg=12
+		highlight ALEErrorSign   ctermbg=1    ctermfg=15
 	" " }}}
 
 	" Plug 'thinca/vim-localrc'              " directory specific vimrc
@@ -79,12 +79,15 @@ call plug#begin('~/.local/share/nvim/plugged')
 		nmap ga <Plug>(EasyAlign)
 
 	Plug 'plasticboy/vim-markdown'         " markdown stuff
+	Plug 'machakann/vim-highlightedyank'
+
+		let g:highlightedyank_highlighted_duration = 1000
+
 	Plug 'dkarter/bullets.vim'
 
 		let g:vim_markdown_folding_disabled = 0
 
 	Plug 'junegunn/goyo.vim'               " make text readable
-	" Plug 'rhysd/vim-grammarous'            " self explanatory
 	Plug 'ntpeters/vim-better-whitespace'  " self explanatory
 
 		au BufRead * EnableStripWhitespaceOnSave
@@ -94,13 +97,16 @@ call plug#begin('~/.local/share/nvim/plugged')
 		let g:templates_no_autocmd = 1
 		let g:templates_directory = "/home/spoonm/documents/templates"
 
-	" Plug 'xuhdev/vim-latex-live-preview'   " self explanatory
-	" 	let g:livepreview_previewer = 'zathura'
-	" 	let g:livepreview_engine = 'pandoc'
+	Plug 'Sirver/ultisnips'
+	Plug 'honza/vim-snippets'
 
-	" Plug 'wlangstroth/vim-racket' " racket stuff
-	" Plug 'lervag/vimtex'          " LaTeX stuff
-	" Plug 'neovimhaskell/haskell-vim'
+		let g:UltiSnipsExpandTrigger = "<tab>"
+		let g:UltiSnipsJumpForwardTrigger = "<c-j>"
+		let g:UltiSnipsJumpBackwardTrigger = "<c-k>"
+		let g:UltiSnipsEditSplit = "vertical"
+		let g:UltiSnipsSnippetDirectories = ["UltiSnips", "mysnippets"]
+
+	" Plug 'glacambre/firenvim', { 'do': {_ -> firenvim#install(0)} }
 
 	" {{{ deoplete
 	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
@@ -110,8 +116,8 @@ call plug#begin('~/.local/share/nvim/plugged')
 		" {{{ mappings
 		inoremap <expr><C-g>    deoplete#undo_completion()
 		inoremap <expr><C-l>    deoplete#complete_common_string()
-		inoremap <expr><TAB>    pumvisible() ? "\<C-n>" : "\<TAB>"
-		inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
+		" inoremap <expr><TAB>    pumvisible() ? "\<C-n>" : "\<TAB>"
+		" inoremap <expr><S-TAB>  pumvisible() ? "\<C-p>" : "\<S-TAB>"
 		inoremap <expr><C-h>    deoplete#smart_close_popup()."\<C-h>"
 		inoremap <expr><BS>     deoplete#smart_close_popup()."\<C-h>"
 		" }}}
@@ -120,12 +126,12 @@ call plug#begin('~/.local/share/nvim/plugged')
 		"}}}
 
 	" {{{ deoplete-go
-	Plug 'zchee/deoplete-go', { 'do': 'make' }
+	" Plug 'zchee/deoplete-go', { 'do': 'make' }
 
-		let g:deoplete#sources#go#gocode_binary = '/home/spoonm/.go/bin/gocode'
-		let g:deoplete#sources#go#package_dot = 1
-		let g:deoplete#sources#go#cgo = 1
-		let g:deoplete#sources#go#cgo#libclang_path = '/usr/lib/libclang.so'
+	" 	let g:deoplete#sources#go#gocode_binary = '/home/spoonm/.go/bin/gocode'
+	" 	let g:deoplete#sources#go#package_dot = 1
+	" 	let g:deoplete#sources#go#cgo = 1
+	" 	let g:deoplete#sources#go#cgo#libclang_path = '/usr/lib/libclang.so'
 	" }}}
 	" {{{ clang_complete
 	Plug 'Rip-Rip/clang_complete', { 'do': 'make' }
@@ -141,7 +147,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 	Plug 'Shougo/neco-vim'
 	Plug 'Shougo/neoinclude.vim'
 	Plug 'Shougo/neopairs.vim'
-	Plug 'eagletmt/neco-ghc'
+	" Plug 'eagletmt/neco-ghc'
 	" }}}
 
 call plug#end()
@@ -166,10 +172,6 @@ tnoremap <Esc> <C-\><C-n>
 " swap backtick and apostrophe because of stupid keyboard layouts
 noremap ' `
 noremap ` '
-" }}}
-" {{{ character shortcuts
-inoremap emd<Space> —<Space>
-inoremap lbda<Space> λ<Space>
 " }}}
 
 " {{{ some functions
@@ -238,20 +240,6 @@ augroup END "}}}
 augroup markdown "{{{
 	au!
 	au FileType markdown set foldlevelstart=99 foldlevel=3
-	au FileType markdown inoremap jj <Esc>/++<Enter>"_c2l
-	au FileType markdown inoremap kk <Esc>?++<Enter>"_c2l
-	au FileType markdown inoremap al$ $$\begin{aligned}<Enter>\end{aligned}$$<Enter><Enter>++<Esc>2kO
-	au FileType markdown inoremap çint \int_{}^{++} ++<Esc>8hi
-	au FileType markdown inoremap çlim \lim_{} ++<Esc>3hi
-	au FileType markdown inoremap çsum \sum_{}^{++} ++<Esc>8hi
-	au FileType markdown inoremap çfr \frac{}{++} ++<Esc>7hi
-	au FileType markdown inoremap çif \infty
-	exe 'au FileType markdown inoremap <silent> <buffer> <script> <expr> <Tab>
-		\ <SID>IsAnEmptyListItem() \|\| <SID>IsAnEmptyQuote() ?
-			\ ''<C-O>:call <SID>Indent(1)<CR>'' :' . maparg('<Tab>', 'i')
-	exe 'au FileType markdown inoremap <silent> <buffer> <script> <expr> <S-Tab>
-		\ <SID>IsAnEmptyListItem() \|\| <SID>IsAnEmptyQuote() ?
-			\ ''<C-O>:call <SID>Indent(0)<CR>'' :' . maparg('<S-Tab>', 'i')
 	au FileType markdown set ts=2 sw=2 et
 augroup END "}}}
 
