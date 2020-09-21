@@ -1,0 +1,40 @@
+/* Add private browsing indicator per tab */
+
+.tab.private-browsing .label:before {
+  content: "🕶";
+}
+
+.tab {
+	border: none !important;
+}
+
+.tab.active,
+.tab:hover {
+	background: #282a2e;
+}
+
+.tab .label {
+	color: #c5c8c6 !important;
+	margin-left: 10px !important;
+}
+
+#tabbar {
+	bottom:0;
+	background: #1d1f21;
+}
+
+#tabbar .tab {
+	margin-left: 0 !important;
+}
+
+/* hidden elements */
+
+.newtab-button-box,
+.tab .closebox {
+	display: none !important;
+}
+
+.twisty {
+	visibility: hidden !important;
+	margin-left: -11px;
+}
