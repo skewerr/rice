@@ -14,14 +14,21 @@ import qualified Config.Dimensions as D
 layoutHook
   = lessBorders OnlyScreenFloat
   . boringWindows
+  . onWorkspaces ["doc"] docLayout
   . onWorkspaces ["anime"] animeLayout
   . onWorkspaces ["web", "gimp"] (fullLayout ||| hiddenQueueLayout)
   $ hiddenQueueLayout ||| fullLayout
 
+docLayout
+  = ratioQueueLayout 1 (1 - D.terminalCRatio 84) D.topWindowRatio D.resizeRatio
+
 hiddenQueueLayout
+  = ratioQueueLayout 2 D.masterRatio D.topWindowRatio D.resizeRatio
+
+ratioQueueLayout ns mr tr rr
   = spacingRaw False screenBorder True windowBorder True
   . hidden
-  $ HQLayout 2 D.masterRatio D.topWindowRatio D.resizeRatio
+  $ HQLayout ns mr tr rr
 
 fullLayout
   = zeroBorders
