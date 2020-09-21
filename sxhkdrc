@@ -52,6 +52,10 @@ shift + ctrl + mod4 + r
 alt + ctrl + mod4 + r
 	record -l -m
 
+# toggling the tray
+mod4 + alt + t
+	toggletray
+
 # make sxhkd reload its configuration files:
 mod4 + Escape
 	pkill -USR1 -x sxhkd
