@@ -30,7 +30,6 @@ bind-key -n M-n     new-window \; set status on
 bind-key -n M-r     command-prompt -I "#W" "rename-window '%%'"
 bind-key -n M-p     choose-tree -Zs
 bind-key -n M-x     run "~/.tmux/plugins/tmux-sessionist/scripts/kill_session_prompt.sh '#{session_name}' '#{session_id}'"
-bind-key -n C-n     run "~/.tmux/plugins/tmux-sessionist/scripts/new_session_prompt.sh"
 
 bind-key -n C-F3    set status
 bind-key -n M-u     run tmux-url-select
