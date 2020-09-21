@@ -107,6 +107,10 @@ mpv() {
     command mpv "$@"
   fi
 }
+
+mp4() {
+  ffmpeg -i "$1" -c:v libx264 -preset slow "${@:2}" "${1%.*}.mp4"
+}
 # }}}
 # {{{ xdg
 export XDG_DESKTOP_DIR="$HOME"
