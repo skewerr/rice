@@ -14,5 +14,6 @@ picom -b
 fcitx -d
 
 udiskie &
+stalonetray &
 
 exec xmonad
