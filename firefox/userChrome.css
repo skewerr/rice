@@ -1,0 +1,99 @@
+/* hide horizontal tabs at the top */
+
+#main-window[tabsintitlebar="true"]:not([extradragspace="true"]) #TabsToolbar > .toolbar-items {
+	opacity: 0 !important;
+	pointer-events: none !important;
+}
+
+#main-window:not([tabsintitlebar="true"]) #TabsToolbar {
+	visibility: collapse !important;
+}
+
+/* hide the TST header at the top of the sidebar */
+
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] #sidebar-header {
+	display: none;
+}
+
+/* hide splitter for TST */
+
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] + #sidebar-splitter {
+	width: 2px !important;
+	pointer-events: none !important;
+	border-color: #656565 !important;
+	background-color: #656565 !important;
+	border-inline-end-color: #656565 !important;
+}
+
+/* change minimum width for sidebars */
+
+#sidebar {
+	min-width: 10px !important;
+}
+
+/* shrink TST until hovered */
+
+:root {
+	--thin-tab-width: 30px;
+	--wide-tab-width: 250px;
+}
+
+#sidebar-box:not([sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"]) {
+	min-width: var(--wide-tab-width) !important;
+	max-width: none !important;
+}
+
+#sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"] {
+	position: relative !important;
+	transition: all 100ms !important;
+	min-width: var(--thin-tab-width) !important;
+	max-width: var(--thin-tab-width) !important;
+}
+
+/* #sidebar-box[sidebarcommand="treestyletab_piro_sakura_ne_jp-sidebar-action"]:hover { */
+/* 	transition: all 200ms !important; */
+/* 	min-width: var(--wide-tab-width) !important; */
+/* 	max-width: var(--wide-tab-width) !important; */
+/* 	margin-right: calc((var(--wide-tab-width) - var(--thin-tab-width)) * -1) !important; */
+/* } */
+
+/* hide in fullscreen */
+#main-window[inFullscreen] #sidebar-box,
+#main-window[inFullscreen] #sidebar-splitter {
+	display: none !important;
+	width: 0px !important;
+}
+
+/* an attempt to auto-hide the navigation bar */
+#navigator-toolbox {
+	--tabbar-height: calc(33px + var(--space-above-tabbar));
+	--trigger-area-height: 5px;
+}
+
+:root[chromehidden~="toolbar"] #navigator-toolbox {
+	--tabbar-height: 0.1px;
+}
+
+#toolbar-menubar {
+	margin-top: 0px !important;
+}
+
+#nav-bar {
+	-moz-window-dragging: default;
+}
+
+:root:not([customizing]) #navigator-toolbox {
+	margin-top: -33px;
+	transition: 100ms;
+}
+
+:root:not([customizing]) #navigator-toolbox:hover,
+:root:not([customizing]) #navigator-toolbox:focus-within {
+	margin-top: 0px;
+}
+
+@-moz-document url-prefix(about:newtab) {
+	* {
+		background-color: #2a2a2e !important;
+	}
+}
