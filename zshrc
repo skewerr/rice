@@ -91,7 +91,7 @@ ghc() {
 
 mosh() {
   case "$1" in
-    (akita|chiba|yamagata|gunma|odroid) )
+    (akita|chiba|yamagata|gunma|tokyo|odroid) )
       command mosh "$1" -- tmuxinator start master
       ;;
     *)
