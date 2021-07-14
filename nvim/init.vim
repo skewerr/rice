@@ -7,7 +7,7 @@ set ttimeoutlen=0
 set incsearch ruler nohlsearch splitbelow splitright number rnu
 set fillchars+=vert:\ ,fold:\  backspace=indent,eol,start
 set foldmethod=marker ignorecase smartcase
-set listchars=tab:⏵\ ,trail:· list
+set listchars=tab:⁞\ ,trail:· list
 set cursorline hidden
 set wildignore=*.o,*.ho,*.hi,*.pdf,*.obj,*.jpg,*.png
 
@@ -51,7 +51,7 @@ call plug#begin('~/.local/share/nvim/plugged')
 	Plug 'Xuyuanp/nerdtree-git-plugin'     " NERDtree git flags
 	" }}}
 	" " {{{ ALE
-	Plug 'w0rp/ale'
+	Plug 'dense-analysis/ale'
 
 		let g:ale_enabled = 0
 		let g:ale_sign_column_always = 1
